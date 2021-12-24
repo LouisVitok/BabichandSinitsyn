@@ -23,16 +23,24 @@ class Object(pygame.sprite.Sprite):
 
 class Health(Object):
     def __init__(self, x, y, speed):
-        super().__init__(load_image("health.png"), x, y, speed)
+        super().__init__("health.png", x, y, speed)
 
 
 def first_phase(screen):
     health = Health(random.randint(5, 795), -50, 5)
     first_phase_running = True
+    quiting_from_game = False
     while first_phase_running:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 first_phase_running = False
-                pygame.quit()
+                quiting_from_game = True
+        all_objects.draw(screen)
+        all_objects.update()
+        pygame.display.flip()
+    if quiting_from_game:
+        pygame.quit()
+        return 0
+    return 1
 
 
