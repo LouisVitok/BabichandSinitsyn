@@ -52,7 +52,7 @@ class Player(pygame.sprite.Sprite):
 
     def update(self, *args):
         if self.jumping:
-            self.rect.move(0, -self.current_jump_speed)
+            self.rect.move(0, -self.current_jump_speed / FPS)
             self.current_jump_speed -= g
             self.y -= self.current_jump_speed
         if self.y >= 500:
@@ -62,11 +62,12 @@ class Player(pygame.sprite.Sprite):
             if args[0][pygame.K_SPACE]:
                 self.jumping = True
             if args[0][pygame.K_a]:
-                self.rect.left -= self.start_speed
+                self.rect.left -= self.start_speed / FPS
 
 
 def first_phase(screen):
     health = Health(random.randint(5, 795), -50, 5)
+    player = Player("player.png", 400, 200, 150, 3)
     first_phase_running = True
     quiting_from_game = False
     while first_phase_running:
@@ -79,6 +80,7 @@ def first_phase(screen):
         screen.fill((255, 255, 255))
         all_objects.draw(screen)
         all_objects.update()
+        player_group.draw(screen)
         fp_clock.tick(FPS)
         pygame.display.flip()
     if quiting_from_game:
