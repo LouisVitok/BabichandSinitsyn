@@ -5,6 +5,9 @@ import random
 
 all_objects = pygame.sprite.Group()
 TIME = 120  # в секундах
+FPS = 60
+g = 1
+fp_clock = pygame.time.Clock()
 
 
 def load_image(name):
@@ -18,7 +21,14 @@ class Object(pygame.sprite.Sprite):
         self.rect = self.image.get_rect().move(x, y)
         self.x = x
         self.y = y
-        self.speed = speed
+        self.start_speed = speed
+        self.current_speed = speed
+
+    def update(self):
+        if self.y <= 500:
+            self.rect = self.rect.move(0, self.current_speed / FPS)
+            self.y += self.current_speed / FPS
+            self.current_speed += g
 
 
 class Health(Object):
@@ -35,8 +45,10 @@ def first_phase(screen):
             if event.type == pygame.QUIT:
                 first_phase_running = False
                 quiting_from_game = True
+        screen.fill((255, 255, 255))
         all_objects.draw(screen)
         all_objects.update()
+        fp_clock.tick(FPS)
         pygame.display.flip()
     if quiting_from_game:
         pygame.quit()
