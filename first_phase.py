@@ -1,5 +1,6 @@
 import pygame
 import os
+import random
 
 
 all_objects = pygame.sprite.Group()
@@ -21,9 +22,11 @@ class Object(pygame.sprite.Sprite):
 
 
 class Health(Object):
-    def __init__(self, image, x, y, speed):
-        super().__init__(image, x, y, speed)
+    def __init__(self, x, y, speed):
+        super().__init__(load_image("health.png"), x, y, speed)
 
 
 def first_phase():
-    ...
+    health = Health(random.randint(5, 795), -50, 5)
+    first_phase_running = True
+

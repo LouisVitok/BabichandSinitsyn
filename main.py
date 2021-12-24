@@ -1,4 +1,5 @@
 import pygame
+import first_phase
 
 if __name__ == '__main__':
     pygame.init()
