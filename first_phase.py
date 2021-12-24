@@ -7,7 +7,7 @@ all_objects = pygame.sprite.Group()
 player_group = pygame.sprite.Group()
 TIME = 120  # в секундах
 FPS = 60
-g = 1
+g = 1  # ускорение свободного падения
 fp_clock = pygame.time.Clock()
 
 
