@@ -4,6 +4,7 @@ import random
 
 
 all_objects = pygame.sprite.Group()
+player_group = pygame.sprite.Group()
 TIME = 120  # в секундах
 FPS = 60
 g = 1
@@ -36,12 +37,18 @@ class Health(Object):
         super().__init__("health.png", x, y, speed)
 
 
-class Player(Object):
-    def __init__(self, x, y, speed, jump_speed):
-        super().__init__("player.png", x, y, speed)
+class Player(pygame.sprite.Sprite):
+    def __init__(self, image, x, y, speed, jump_speed):
+        super().__init__(player_group)
+        self.x = x
+        self.y = y
+        self.start_speed = speed
+        self.current_speed = speed
         self.start_jump_speed = jump_speed
         self.current_jump_speed = jump_speed
         self.jumping = False
+        self.image = load_image(image)
+        self.rect = self.image.get_rect().move(x, y)
 
     def update(self, *args):
         if self.jumping:
@@ -67,6 +74,8 @@ def first_phase(screen):
             if event.type == pygame.QUIT:
                 first_phase_running = False
                 quiting_from_game = True
+            if pygame.key.get_pressed():
+                player_group.update(pygame.key.get_pressed())
         screen.fill((255, 255, 255))
         all_objects.draw(screen)
         all_objects.update()
