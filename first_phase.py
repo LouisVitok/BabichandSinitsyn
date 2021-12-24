@@ -10,17 +10,18 @@ def load_image(name):
 
 
 class Object(pygame.sprite.Sprite):
-    def __init__(self, image, x, y, speed, ):
+    def __init__(self, image, x, y, speed):
         super().__init__(all_objects)
         self.image = load_image(image)
         self.rect = self.image.get_rect().move(x, y)
         self.x = x
         self.y = y
+        self.speed = speed
 
 
 class Health(Object):
-    def __init__(self, image, x, y):
-        super().__init__(image, x, y)
+    def __init__(self, image, x, y, speed):
+        super().__init__(image, x, y, speed)
 
 
 def first_phase():
