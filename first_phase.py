@@ -3,6 +3,7 @@ import os
 
 
 all_objects = pygame.sprite.Group()
+TIME = 120  # в секундах
 
 
 def load_image(name):
