@@ -1,12 +1,12 @@
 import pygame
-import first_phase
+from first_phase import first_phase
 
 if __name__ == '__main__':
     pygame.init()
     pygame.display.set_caption('Игра')
     size = width, height = 800, 600
     screen = pygame.display.set_mode(size)
-
+    first_phase(screen)
     running = True
     x_pos = 0
     v = 20
