@@ -36,6 +36,23 @@ class Health(Object):
         super().__init__("health.png", x, y, speed)
 
 
+class Player(Object):
+    def __init__(self, x, y, speed, jump_speed):
+        super().__init__("player.png", x, y, speed)
+        self.start_jump_speed = jump_speed
+        self.current_jump_speed = jump_speed
+        self.jumping = False
+
+    def update(self):
+        if self.jumping:
+            self.rect.move(0, -self.current_jump_speed)
+            self.current_jump_speed -= g
+            self.y -= self.current_jump_speed
+        if self.y >= 500:
+            self.jumping = False
+            self.current_jump_speed = self.start_jump_speed
+
+
 def first_phase(screen):
     health = Health(random.randint(5, 795), -50, 5)
     first_phase_running = True
