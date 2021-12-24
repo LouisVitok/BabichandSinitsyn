@@ -26,7 +26,13 @@ class Health(Object):
         super().__init__(load_image("health.png"), x, y, speed)
 
 
-def first_phase():
+def first_phase(screen):
     health = Health(random.randint(5, 795), -50, 5)
     first_phase_running = True
+    while first_phase_running:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                first_phase_running = False
+                pygame.quit()
+
 
