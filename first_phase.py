@@ -43,7 +43,7 @@ class Player(Object):
         self.current_jump_speed = jump_speed
         self.jumping = False
 
-    def update(self):
+    def update(self, *args):
         if self.jumping:
             self.rect.move(0, -self.current_jump_speed)
             self.current_jump_speed -= g
@@ -51,6 +51,11 @@ class Player(Object):
         if self.y >= 500:
             self.jumping = False
             self.current_jump_speed = self.start_jump_speed
+        if args:
+            if args[0][pygame.K_SPACE]:
+                self.jumping = True
+            if args[0][pygame.K_a]:
+                self.rect.left -= self.start_speed
 
 
 def first_phase(screen):
