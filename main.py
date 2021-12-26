@@ -7,7 +7,7 @@ FPS = 60
 
 
 def load_image(name):
-    fullname = os.path.join(name)
+    fullname = os.path.join('images', name)
     image = pygame.image.load(fullname)
     image = image.convert_alpha()
     return image
@@ -46,7 +46,7 @@ if __name__ == '__main__':
     clock = pygame.time.Clock()
     start_screen(800, 600)
 
-    if first_phase(screen):
+    if first_phase(screen, width, height):
         running = True
         x_pos = 0
         v = 30

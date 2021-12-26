@@ -76,11 +76,13 @@ class Player(pygame.sprite.Sprite):
                 self.rect.left += self.start_speed * timedelta
 
 
-def first_phase(screen):
+def first_phase(screen, width, height):
     objects = [Health(random.randint(5, 795), -50, 5)]
     player = Player("player.png", 400, 500, 160, 6)
     first_phase_running = True
     quiting_from_game = False
+    background = pygame.transform.scale(load_image('zastavka.jpg'), (width, height))
+    screen.blit(background, (0, 0))
     while first_phase_running:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -94,7 +96,7 @@ def first_phase(screen):
         if player.rect.top >= 500:
             player.jumping = False
             player.current_jump_speed = player.start_jump_speed
-        screen.fill((255, 255, 255))
+        screen.blit(background, (0, 0))
         all_objects.draw(screen)
         all_objects.update()
         player_group.draw(screen)
