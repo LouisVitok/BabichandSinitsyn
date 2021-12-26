@@ -9,7 +9,7 @@ player_group = pygame.sprite.Group()
 TIME = 120  # в секундах
 FPS = 60
 Fg = 0.2  # сила притяжения
-g = 1
+g = 4
 fp_clock = pygame.time.Clock()
 health_appearing_chance = 2
 objects_existing_time = 5
@@ -67,7 +67,6 @@ class Player(pygame.sprite.Sprite):
 
     def update(self, *args):
         timedelta = fp_clock.tick(FPS) / 1000
-        print(timedelta)
         if args:
             if args[0][pygame.K_w] or args[0][pygame.K_SPACE]:
                 self.jumping = True
