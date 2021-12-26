@@ -10,7 +10,7 @@ TIME = 120  # в секундах
 FPS = 60
 Fg = 0.2  # сила притяжения
 fp_clock = pygame.time.Clock()
-health_appearing_chance = 5
+health_appearing_chance = 2
 objects_existing_time = 5
 
 
@@ -103,6 +103,10 @@ def first_phase(screen):
         dice = random.randint(1, 100)
         if dice <= health_appearing_chance and len(objects) <= 4:
             objects.append(Health(random.randint(5, 795), -50, 5))
+        for obj_i in range(len(objects)):
+            if objects[obj_i].erase:
+                objects.pop(obj_i)
+                break
     if quiting_from_game:
         pygame.quit()
         return 0
