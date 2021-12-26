@@ -9,6 +9,7 @@ player_group = pygame.sprite.Group()
 TIME = 120  # в секундах
 FPS = 60
 Fg = 0.2  # сила притяжения
+g = 1
 fp_clock = pygame.time.Clock()
 health_appearing_chance = 2
 objects_existing_time = 5
@@ -38,9 +39,9 @@ class Object(pygame.sprite.Sprite):
             if self.current_time - self.start_time >= float(objects_existing_time):
                 self.erase = True
         if self.rect.top <= 500:
-            self.rect = self.rect.move(0, self.current_speed / FPS)
-            self.y += self.current_speed / FPS
-            self.current_speed += Fg
+            self.rect = self.rect.move(0, self.current_speed / FPS + g)
+            self.y += self.current_speed / FPS + g
+            self.current_speed += g
         elif not self.on_ground:
             self.on_ground = True
             self.start_time = time.perf_counter()
@@ -105,6 +106,7 @@ def first_phase(screen):
             objects.append(Health(random.randint(5, 795), -50, 5))
         for obj_i in range(len(objects)):
             if objects[obj_i].erase:
+                all_objects.remove(objects[obj_i])
                 objects.pop(obj_i)
                 break
     if quiting_from_game:
