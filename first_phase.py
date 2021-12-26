@@ -7,7 +7,7 @@ all_objects = pygame.sprite.Group()
 player_group = pygame.sprite.Group()
 TIME = 120  # в секундах
 FPS = 60
-g = 0.2  # ускорение свободного падения
+Fg = 0.2  # сила притяжения
 fp_clock = pygame.time.Clock()
 
 
@@ -29,8 +29,7 @@ class Object(pygame.sprite.Sprite):
         if self.rect.top <= 500:
             self.rect = self.rect.move(0, self.current_speed / FPS)
             self.y += self.current_speed / FPS
-            self.current_speed += g
-            print(1)
+            self.current_speed += Fg
 
 
 class Health(Object):
@@ -52,18 +51,20 @@ class Player(pygame.sprite.Sprite):
         self.rect = self.image.get_rect().move(x, y)
 
     def update(self, *args):
+        print(args)
+        timedelta = fp_clock.tick(FPS) / 1000
         if args:
             if args[0][pygame.K_w] or args[0][pygame.K_SPACE]:
                 self.jumping = True
             if args[0][pygame.K_a]:
-                self.rect.left -= self.start_speed
+                self.rect.left -= self.start_speed * timedelta
             if args[0][pygame.K_d]:
-                self.rect.left += self.start_speed
+                self.rect.left += self.start_speed * timedelta
 
 
 def first_phase(screen):
     health = Health(random.randint(5, 795), -50, 5)
-    player = Player("player.png", 400, 500, 3, 6)
+    player = Player("player.png", 400, 500, 123, 6)
     first_phase_running = True
     quiting_from_game = False
     while first_phase_running:
@@ -75,7 +76,7 @@ def first_phase(screen):
                 player_group.update(pygame.key.get_pressed())
         if player.jumping:
             player.rect.top -= player.current_jump_speed
-            player.current_jump_speed -= g
+            player.current_jump_speed -= Fg
         if player.rect.top >= 500:
             player.jumping = False
             player.current_jump_speed = player.start_jump_speed
