@@ -11,8 +11,11 @@ FPS = 60
 Fg = 0.2  # сила притяжения
 g = 4
 fp_clock = pygame.time.Clock()
-health_appearing_chance = 2
+health_appearing_chance = 1.5
+trap_appearing_chance = 0.4
 objects_existing_time = 5
+health_max_count = 4
+traps_max_count = 2
 
 
 def load_image(name):
@@ -54,7 +57,9 @@ class Health(Object):
 
 class Trap(Object):
     def __init__(self, x, y, speed):
-        super().__init__("trap", x, y, speed)
+        super().__init__("trap.png", x, y, speed)
+        self.image = pygame.transform.scale(self.image, (50, 50))
+
 
 class Player(pygame.sprite.Sprite):
     def __init__(self, image, x, y, speed, jump_speed):
@@ -81,6 +86,8 @@ class Player(pygame.sprite.Sprite):
 
 
 def first_phase(screen, width, height):
+    health_count = 1
+    traps_count = 0
     objects = [Health(random.randint(5, 795), -50, 5)]
     player = Player("player.png", 400, 500, 160, 6)
     first_phase_running = True
@@ -106,11 +113,20 @@ def first_phase(screen, width, height):
         player_group.draw(screen)
         pygame.display.flip()
         fp_clock.tick(FPS)
-        dice = random.randint(1, 100)
-        if dice <= health_appearing_chance and len(objects) <= 4:
+        dice = random.uniform(1.0, 100.0)
+        if dice <= health_appearing_chance and health_count <= health_max_count:
             objects.append(Health(random.randint(5, 795), -50, 5))
+            health_count += 1
+        dice = random.uniform(0.1, 100.0)
+        if dice <= trap_appearing_chance and traps_count <= traps_max_count:
+            objects.append(Trap(random.randint(5, 795), -50, 5))
+            traps_count += 1
         for obj_i in range(len(objects)):
             if objects[obj_i].erase:
+                if type(objects[obj_i]) == Health:
+                    health_count -= 1
+                if type(objects[obj_i]) == Trap:
+                    traps_count -= 1
                 all_objects.remove(objects[obj_i])
                 objects.pop(obj_i)
                 break
