@@ -24,6 +24,8 @@ HEALTH_TEXT_X = 10
 HEALTH_TEXT_Y = 10
 PLAYER_HEALTH_X = 120
 PLAYER_HEALTH_Y = 10
+TIMER_TEXT_Y = 10
+TIMER_Y = 10
 
 
 def load_image(name):
@@ -100,7 +102,8 @@ def first_phase(screen, width, height):
     background = pygame.transform.scale(load_image('zastavka.jpg'), (width, height))
     health_text = pygame.font.Font(None, 30).render('Здоровье:', True, (255, 0, 0))
     player_health_text = pygame.font.Font(None, 30).render(str(PLAYER_HEALTH), True, (255, 0, 0))
-    health_text_rect = health_text.get_rect()
+    timer_text = pygame.font.Font(None, 30).render('Время:', True, (130, 131, 133))
+    seconds_timer_text = pygame.font.Font(None, 30).render(str(TIMER), True, (130, 131, 133))
     while first_phase_running:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -123,6 +126,8 @@ def first_phase(screen, width, height):
         screen.blit(background, (0, 0))
         screen.blit(health_text, (HEALTH_TEXT_X, HEALTH_TEXT_Y))
         screen.blit(player_health_text, (PLAYER_HEALTH_X, PLAYER_HEALTH_Y))
+        screen.blit(timer_text, (width - 115, TIMER_Y))
+        screen.blit(seconds_timer_text, (width - 35, TIMER_Y))
         all_objects.draw(screen)
         all_objects.update()
         player_group.draw(screen)
