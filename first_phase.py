@@ -18,6 +18,12 @@ health_max_count = 4  # максимальное кол-во здоровья
 traps_max_count = 2  # максимальное кол-во ловушек
 PLAYER_SPEED = 8  # скорость игрока
 PLAYER_JUMP_SPEED = 9  # скорость/ускорения прыжка игрока
+PLAYER_HEALTH = 10  # здоровье игрока
+TIMER = 60  # таймер на первую фазу (в секундах)
+HEALTH_TEXT_X = 10
+HEALTH_TEXT_Y = 10
+PLAYER_HEALTH_X = 120
+PLAYER_HEALTH_Y = 10
 
 
 def load_image(name):
@@ -92,7 +98,9 @@ def first_phase(screen, width, height):
     first_phase_running = True
     quiting_from_game = False
     background = pygame.transform.scale(load_image('zastavka.jpg'), (width, height))
-    screen.blit(background, (0, 0))
+    health_text = pygame.font.Font(None, 30).render('Здоровье:', True, (255, 0, 0))
+    player_health_text = pygame.font.Font(None, 30).render(str(PLAYER_HEALTH), True, (255, 0, 0))
+    health_text_rect = health_text.get_rect()
     while first_phase_running:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -113,6 +121,8 @@ def first_phase(screen, width, height):
             player.jumping = False
             player.current_jump_speed = player.start_jump_speed
         screen.blit(background, (0, 0))
+        screen.blit(health_text, (HEALTH_TEXT_X, HEALTH_TEXT_Y))
+        screen.blit(player_health_text, (PLAYER_HEALTH_X, PLAYER_HEALTH_Y))
         all_objects.draw(screen)
         all_objects.update()
         player_group.draw(screen)
