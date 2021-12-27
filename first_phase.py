@@ -52,6 +52,10 @@ class Health(Object):
         super().__init__("health.png", x, y, speed)
 
 
+class Trap(Object):
+    def __init__(self, x, y, speed):
+        super().__init__("trap", x, y, speed)
+
 class Player(pygame.sprite.Sprite):
     def __init__(self, image, x, y, speed, jump_speed):
         super().__init__(player_group)
