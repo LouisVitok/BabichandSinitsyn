@@ -9,15 +9,15 @@ player_group = pygame.sprite.Group()
 TIME = 120  # в секундах
 FPS = 60
 Fg = 0.2  # сила притяжения
-g = 4
+g = 4  # ускорение свободного падения
 fp_clock = pygame.time.Clock()
-health_appearing_chance = 1.5
-trap_appearing_chance = 0.4
-objects_existing_time = 5
-health_max_count = 4
-traps_max_count = 2
-PLAYER_SPEED = 8
-PLAYER_JUMP_SPEED = 9
+health_appearing_chance = 1.5  # шанс появления здоровья
+trap_appearing_chance = 0.4  # шанс появления ловушек
+objects_existing_time = 5  # время жизни объектов на змеле (в секундах)
+health_max_count = 4  # максимальное кол-во здоровья
+traps_max_count = 2  # максимальное кол-во ловушек
+PLAYER_SPEED = 8  # скорость игрока
+PLAYER_JUMP_SPEED = 9  # скорость/ускорения прыжка игрока
 
 
 def load_image(name):
