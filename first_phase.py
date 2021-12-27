@@ -16,7 +16,7 @@ trap_appearing_chance = 0.4
 objects_existing_time = 5
 health_max_count = 4
 traps_max_count = 2
-PLAYER_SPEED = 10
+PLAYER_SPEED = 8
 PLAYER_JUMP_SPEED = 9
 
 
@@ -87,7 +87,7 @@ def first_phase(screen, width, height):
     pygame.event.set_allowed([pygame.QUIT])
     health_count = 1
     traps_count = 0
-    objects = [Health(random.randint(5, 795), -50, 5)]
+    objects = [Health(random.randint(5, 745), -50, 5)]
     player = Player("player.png", 400, 500, PLAYER_SPEED, PLAYER_JUMP_SPEED)
     first_phase_running = True
     quiting_from_game = False
@@ -98,11 +98,12 @@ def first_phase(screen, width, height):
             if event.type == pygame.QUIT:
                 first_phase_running = False
                 quiting_from_game = True
-            if pygame.key.get_pressed():
+            if pygame.KEYDOWN:
                 if pygame.key.get_pressed()[pygame.K_a]:
                     player.go_left()
                 if pygame.key.get_pressed()[pygame.K_d]:
                     player.go_right()
+            if pygame.key.get_pressed():
                 if pygame.key.get_pressed()[pygame.K_w] or pygame.key.get_pressed()[pygame.K_SPACE]:
                     player.jumping = True
         if player.jumping:
@@ -123,7 +124,7 @@ def first_phase(screen, width, height):
             health_count += 1
         dice = random.uniform(0.1, 100.0)
         if dice <= trap_appearing_chance and traps_count <= traps_max_count:
-            objects.append(Trap(random.randint(5, 795), -50, 5))
+            objects.append(Trap(random.randint(5, 745), -50, 5))
             traps_count += 1
         for obj_i in range(len(objects)):
             if objects[obj_i].erase:
