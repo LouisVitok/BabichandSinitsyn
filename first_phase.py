@@ -16,6 +16,8 @@ trap_appearing_chance = 0.4
 objects_existing_time = 5
 health_max_count = 4
 traps_max_count = 2
+PLAYER_SPEED = 10
+PLAYER_JUMP_SPEED = 9
 
 
 def load_image(name):
@@ -74,22 +76,19 @@ class Player(pygame.sprite.Sprite):
         self.image = load_image(image)
         self.rect = self.image.get_rect().move(x, y)
 
-    def update(self, *args):
-        timedelta = fp_clock.tick(FPS) / 1000
-        if args:
-            if args[0][pygame.K_w] or args[0][pygame.K_SPACE]:
-                self.jumping = True
-            if args[0][pygame.K_a]:
-                self.rect.left -= self.start_speed * timedelta
-            if args[0][pygame.K_d]:
-                self.rect.left += self.start_speed * timedelta
+    def go_right(self):
+        self.rect.left += self.start_speed
+
+    def go_left(self):
+        self.rect.left -= self.start_speed
 
 
 def first_phase(screen, width, height):
+    pygame.event.set_allowed([pygame.QUIT])
     health_count = 1
     traps_count = 0
     objects = [Health(random.randint(5, 795), -50, 5)]
-    player = Player("player.png", 400, 500, 160, 6)
+    player = Player("player.png", 400, 500, PLAYER_SPEED, PLAYER_JUMP_SPEED)
     first_phase_running = True
     quiting_from_game = False
     background = pygame.transform.scale(load_image('zastavka.jpg'), (width, height))
@@ -100,7 +99,12 @@ def first_phase(screen, width, height):
                 first_phase_running = False
                 quiting_from_game = True
             if pygame.key.get_pressed():
-                player_group.update(pygame.key.get_pressed())
+                if pygame.key.get_pressed()[pygame.K_a]:
+                    player.go_left()
+                if pygame.key.get_pressed()[pygame.K_d]:
+                    player.go_right()
+                if pygame.key.get_pressed()[pygame.K_w] or pygame.key.get_pressed()[pygame.K_SPACE]:
+                    player.jumping = True
         if player.jumping:
             player.rect.top -= player.current_jump_speed
             player.current_jump_speed -= Fg
