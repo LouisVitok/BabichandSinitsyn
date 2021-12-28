@@ -18,6 +18,7 @@ health_max_count = 4  # максимальное кол-во здоровья
 traps_max_count = 2  # максимальное кол-во ловушек
 PLAYER_SPEED = 8  # скорость игрока
 PLAYER_JUMP_SPEED = 9  # скорость/ускорения прыжка игрока
+PLAYER_REBOUND_SPEED = 4  # скорость/ускорения отскока игрока по координате x
 PLAYER_HEALTH = 10  # здоровье игрока
 TIMER = 30  # таймер на первую фазу (в секундах)
 HEALTH_TEXT_X = 10
@@ -72,7 +73,7 @@ class Trap(Object):
 
 
 class Player(pygame.sprite.Sprite):
-    def __init__(self, image, x, y, speed, jump_speed):
+    def __init__(self, image, x, y, speed, jump_speed, rebound_speed):
         super().__init__(player_group)
         self.x = x
         self.y = y
@@ -84,6 +85,8 @@ class Player(pygame.sprite.Sprite):
         self.image = load_image(image)
         self.rect = self.image.get_rect().move(x, y)
         self.rebound = False
+        self.rebound_speed = rebound_speed
+        self.rebound_direction = 0
 
     def go_right(self):
         self.rect.left += self.start_speed
@@ -99,7 +102,7 @@ def first_phase(screen, width, height):
     health_count = 1
     traps_count = 0
     objects = [Health(random.randint(5, 745), -50, 5)]
-    player = Player("player.png", 400, 417, PLAYER_SPEED, PLAYER_JUMP_SPEED)
+    player = Player("player.png", 400, 417, PLAYER_SPEED, PLAYER_JUMP_SPEED, PLAYER_REBOUND_SPEED)
     first_phase_running = True
     quiting_from_game = False
     background = pygame.transform.scale(load_image('zastavka.jpg'), (width, height))
@@ -116,15 +119,14 @@ def first_phase(screen, width, height):
                 first_phase_running = False
                 quiting_from_game = True
             if pygame.KEYDOWN:
-                if pygame.key.get_pressed()[pygame.K_a]:
+                if pygame.key.get_pressed()[pygame.K_a] and not player.rebound:
                     player.go_left()
-                if pygame.key.get_pressed()[pygame.K_d]:
+                if pygame.key.get_pressed()[pygame.K_d] and not player.rebound:
                     player.go_right()
             if pygame.key.get_pressed():
-                if pygame.key.get_pressed()[pygame.K_w] or pygame.key.get_pressed()[pygame.K_SPACE]:
+                if (pygame.key.get_pressed()[pygame.K_w] or pygame.key.get_pressed()[pygame.K_SPACE])\
+                        and not player.rebound:
                     player.jumping = True
-                if pygame.key.get_pressed()[pygame.K_s]:
-                    player.rebound = True
         if player.jumping:
             player.rect.top -= player.current_jump_speed
             player.current_jump_speed -= Fg
@@ -132,12 +134,13 @@ def first_phase(screen, width, height):
                 player.jumping = False
                 player.current_jump_speed = player.start_jump_speed
         if player.rebound:
-            player.rect.top -= player.current_jump_speed
-            player.rect.left -= player.start_jump_speed
+            player.rect.top -= player.current_jump_speed // 2
+            player.rect.left += player.rebound_speed * player.rebound_direction
             player.current_jump_speed -= Fg
             if player.rect.top >= 417:
                 player.rebound = False
                 player.current_jump_speed = player.start_jump_speed
+                player.rebound_direction = 0
         screen.blit(background, (0, 0))
         screen.blit(health_text, (HEALTH_TEXT_X, HEALTH_TEXT_Y))
         screen.blit(player_health_text, (PLAYER_HEALTH_X, PLAYER_HEALTH_Y))
@@ -162,6 +165,14 @@ def first_phase(screen, width, height):
                     player_health += 1
                     player_health_text = pygame.font.Font(None, 30).render(str(player_health), True, (255, 0, 0))
                     objects[obj_i].erase = True
+                if type(objects[obj_i]) == Trap:
+                    player.rebound = True
+                    if objects[obj_i].rect.x < player.rect.x:
+                        player.rebound_direction = 1
+                    elif objects[obj_i].rect.x > player.rect.x:
+                        player.rebound_direction = -1
+                    player_health -= 1
+                    player_health_text = pygame.font.Font(None, 30).render(str(player_health), True, (255, 0, 0))
             if objects[obj_i].erase:
                 if type(objects[obj_i]) == Health:
                     health_count -= 1
