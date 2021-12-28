@@ -70,6 +70,8 @@ class Trap(Object):
     def __init__(self, x, y, speed):
         super().__init__("trap.png", x, y, speed)
         self.image = pygame.transform.scale(self.image, (50, 50))
+        self.rect.w = 50
+        self.rect.h = 50
 
 
 class Player(pygame.sprite.Sprite):
