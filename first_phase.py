@@ -83,6 +83,7 @@ class Player(pygame.sprite.Sprite):
         self.jumping = False
         self.image = load_image(image)
         self.rect = self.image.get_rect().move(x, y)
+        self.rebound = False
 
     def go_right(self):
         self.rect.left += self.start_speed
@@ -93,6 +94,7 @@ class Player(pygame.sprite.Sprite):
 
 def first_phase(screen, width, height):
     time_left = TIMER
+    player_health = PLAYER_HEALTH
     pygame.event.set_allowed([pygame.QUIT])
     health_count = 1
     traps_count = 0
@@ -121,12 +123,21 @@ def first_phase(screen, width, height):
             if pygame.key.get_pressed():
                 if pygame.key.get_pressed()[pygame.K_w] or pygame.key.get_pressed()[pygame.K_SPACE]:
                     player.jumping = True
+                if pygame.key.get_pressed()[pygame.K_s]:
+                    player.rebound = True
         if player.jumping:
             player.rect.top -= player.current_jump_speed
             player.current_jump_speed -= Fg
-        if player.rect.top >= 417:
-            player.jumping = False
-            player.current_jump_speed = player.start_jump_speed
+            if player.rect.top >= 417:
+                player.jumping = False
+                player.current_jump_speed = player.start_jump_speed
+        if player.rebound:
+            player.rect.top -= player.current_jump_speed
+            player.rect.left -= player.start_jump_speed
+            player.current_jump_speed -= Fg
+            if player.rect.top >= 417:
+                player.rebound = False
+                player.current_jump_speed = player.start_jump_speed
         screen.blit(background, (0, 0))
         screen.blit(health_text, (HEALTH_TEXT_X, HEALTH_TEXT_Y))
         screen.blit(player_health_text, (PLAYER_HEALTH_X, PLAYER_HEALTH_Y))
@@ -146,6 +157,11 @@ def first_phase(screen, width, height):
             objects.append(Trap(random.randint(5, 745), -50, 5))
             traps_count += 1
         for obj_i in range(len(objects)):
+            if objects[obj_i].rect.colliderect(player.rect):
+                if type(objects[obj_i]) == Health:
+                    player_health += 1
+                    player_health_text = pygame.font.Font(None, 30).render(str(player_health), True, (255, 0, 0))
+                    objects[obj_i].erase = True
             if objects[obj_i].erase:
                 if type(objects[obj_i]) == Health:
                     health_count -= 1
