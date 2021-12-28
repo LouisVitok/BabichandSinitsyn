@@ -19,7 +19,7 @@ traps_max_count = 2  # максимальное кол-во ловушек
 PLAYER_SPEED = 8  # скорость игрока
 PLAYER_JUMP_SPEED = 9  # скорость/ускорения прыжка игрока
 PLAYER_HEALTH = 10  # здоровье игрока
-TIMER = 60  # таймер на первую фазу (в секундах)
+TIMER = 30  # таймер на первую фазу (в секундах)
 HEALTH_TEXT_X = 10
 HEALTH_TEXT_Y = 10
 PLAYER_HEALTH_X = 120
@@ -51,7 +51,7 @@ class Object(pygame.sprite.Sprite):
             self.current_time = time.perf_counter()
             if self.current_time - self.start_time >= float(objects_existing_time):
                 self.erase = True
-        if self.rect.top <= 500:
+        if self.rect.top <= 415:
             self.rect = self.rect.move(0, self.current_speed / FPS + g)
             self.y += self.current_speed / FPS + g
             self.current_speed += g
@@ -97,7 +97,7 @@ def first_phase(screen, width, height):
     health_count = 1
     traps_count = 0
     objects = [Health(random.randint(5, 745), -50, 5)]
-    player = Player("player.png", 400, 500, PLAYER_SPEED, PLAYER_JUMP_SPEED)
+    player = Player("player.png", 400, 417, PLAYER_SPEED, PLAYER_JUMP_SPEED)
     first_phase_running = True
     quiting_from_game = False
     background = pygame.transform.scale(load_image('zastavka.jpg'), (width, height))
@@ -124,7 +124,7 @@ def first_phase(screen, width, height):
         if player.jumping:
             player.rect.top -= player.current_jump_speed
             player.current_jump_speed -= Fg
-        if player.rect.top >= 500:
+        if player.rect.top >= 417:
             player.jumping = False
             player.current_jump_speed = player.start_jump_speed
         screen.blit(background, (0, 0))
