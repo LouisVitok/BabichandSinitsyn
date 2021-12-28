@@ -92,6 +92,7 @@ class Player(pygame.sprite.Sprite):
 
 
 def first_phase(screen, width, height):
+    time_left = TIMER
     pygame.event.set_allowed([pygame.QUIT])
     health_count = 1
     traps_count = 0
@@ -104,7 +105,10 @@ def first_phase(screen, width, height):
     player_health_text = pygame.font.Font(None, 30).render(str(PLAYER_HEALTH), True, (255, 0, 0))
     timer_text = pygame.font.Font(None, 30).render('Время:', True, (130, 131, 133))
     seconds_timer_text = pygame.font.Font(None, 30).render(str(TIMER), True, (130, 131, 133))
+    start_onesec = 0
     while first_phase_running:
+        if not start_onesec:
+            start_onesec = time.perf_counter()
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 first_phase_running = False
@@ -150,9 +154,13 @@ def first_phase(screen, width, height):
                 all_objects.remove(objects[obj_i])
                 objects.pop(obj_i)
                 break
+        if time.perf_counter() - start_onesec >= 1:
+            time_left -= 1
+            seconds_timer_text = pygame.font.Font(None, 30).render(str(time_left), True, (130, 131, 133))
+            start_onesec = 0
+        if not time_left:
+            return 1
     if quiting_from_game:
         pygame.quit()
         return 0
     return 1
-
-
