@@ -13,7 +13,7 @@ g = 4  # ускорение свободного падения
 fp_clock = pygame.time.Clock()
 health_appearing_chance = 1.5  # шанс появления здоровья
 trap_appearing_chance = 0.4  # шанс появления ловушек
-watches_appearing_chance = 0.2  # шанс появления часов
+watches_appearing_chance = 0.3  # шанс появления часов
 objects_existing_time = 5  # время жизни объектов на змеле (в секундах)
 health_max_count = 4  # максимальное кол-во здоровья
 traps_max_count = 2  # максимальное кол-во ловушек
@@ -222,6 +222,7 @@ def first_phase(screen, width, height):
                 if type(objects[obj_i]) == Watches:
                     objects[obj_i].erase = True
                     time_left += 3
+                    seconds_timer_text = pygame.font.Font(None, 30).render(str(time_left), True, (130, 131, 133))
             if type(objects[obj_i]) == Watches:
                 if objects[obj_i].x <= -150 or objects[obj_i].x >= width + 175:
                     objects[obj_i].erase = True
