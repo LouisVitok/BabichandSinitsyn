@@ -222,6 +222,11 @@ def first_phase(screen, width, height):
                 if type(objects[obj_i]) == Watches:
                     objects[obj_i].erase = True
                     time_left += 3
+            if type(objects[obj_i]) == Watches:
+                if objects[obj_i].x <= -150 or objects[obj_i].x >= width + 175:
+                    objects[obj_i].erase = True
+                if objects[obj_i].y <= -150 or objects[obj_i].y >= height + 175:
+                    objects[obj_i].erase = True
             if objects[obj_i].erase:
                 if type(objects[obj_i]) == Health:
                     health_count -= 1
