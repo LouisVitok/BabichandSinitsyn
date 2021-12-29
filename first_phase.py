@@ -74,6 +74,14 @@ class Trap(Object):
         self.rect.h = 50
 
 
+class Watches(Object):
+    def __init__(self, x, y, speed):
+        super().__init__("time.png", x, y, speed)
+        self.image = pygame.transform.scale(self.image, (50, 50))
+        self.rect.w = 50
+        self.rect.h = 50
+
+
 class Player(pygame.sprite.Sprite):
     def __init__(self, image, x, y, speed, jump_speed, rebound_speed):
         super().__init__(player_group)
