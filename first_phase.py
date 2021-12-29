@@ -13,9 +13,11 @@ g = 4  # ускорение свободного падения
 fp_clock = pygame.time.Clock()
 health_appearing_chance = 1.5  # шанс появления здоровья
 trap_appearing_chance = 0.4  # шанс появления ловушек
+watches_appearing_chance = 0.2  # шанс появления часов
 objects_existing_time = 5  # время жизни объектов на змеле (в секундах)
 health_max_count = 4  # максимальное кол-во здоровья
 traps_max_count = 2  # максимальное кол-во ловушек
+watches_max_count = 1  # максимальное кол-во часов
 PLAYER_SPEED = 8  # скорость игрока
 PLAYER_JUMP_SPEED = 9  # скорость/ускорения прыжка игрока
 PLAYER_REBOUND_SPEED = 4  # скорость/ускорения отскока игрока по координате x
@@ -123,7 +125,8 @@ def first_phase(screen, width, height):
     pygame.event.set_allowed([pygame.QUIT])
     health_count = 1
     traps_count = 0
-    objects = [Health(random.randint(5, 745), -50, 5), Watches(random.randint(5, 745), -50, -5, 5)]
+    watches_count = 0
+    objects = [Health(random.randint(5, width - 55), -50, 5)]
     player = Player("player.png", 400, 417, PLAYER_SPEED, PLAYER_JUMP_SPEED, PLAYER_REBOUND_SPEED)
     first_phase_running = True
     quiting_from_game = False
@@ -175,12 +178,18 @@ def first_phase(screen, width, height):
         fp_clock.tick(FPS)
         dice = random.uniform(1.0, 100.0)
         if dice <= health_appearing_chance and health_count <= health_max_count:
-            objects.append(Health(random.randint(5, 795), -50, 5))
+            objects.append(Health(random.randint(5, width - 55), -50, 5))
             health_count += 1
         dice = random.uniform(0.1, 100.0)
         if dice <= trap_appearing_chance and traps_count <= traps_max_count:
-            objects.append(Trap(random.randint(5, 745), -50, 5))
+            objects.append(Trap(random.randint(5, width - 55), -50, 5))
             traps_count += 1
+        dice = random.uniform(0.1, 100.0)
+        if dice <= watches_appearing_chance and watches_count <= watches_max_count:
+            watches_y = random.randint(5, width - 55)
+
+            #  objects.append(Watches(random.randint(5, 745), -50, 5))
+            watches_count += 1
         for obj_i in range(len(objects)):
             if objects[obj_i].rect.colliderect(player.rect):
                 if type(objects[obj_i]) == Health:
@@ -195,11 +204,16 @@ def first_phase(screen, width, height):
                         player.rebound_direction = -1
                     player_health -= 1
                     player_health_text = pygame.font.Font(None, 30).render(str(player_health), True, (255, 0, 0))
+                if type(objects[obj_i]) == Watches:
+                    objects[obj_i].erase = True
+                    time_left += 3
             if objects[obj_i].erase:
                 if type(objects[obj_i]) == Health:
                     health_count -= 1
                 if type(objects[obj_i]) == Trap:
                     traps_count -= 1
+                if type(objects[obj_i]) == Watches:
+                    watches_count -= 1
                 all_objects.remove(objects[obj_i])
                 objects.pop(obj_i)
                 break
