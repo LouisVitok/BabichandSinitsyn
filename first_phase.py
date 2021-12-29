@@ -74,12 +74,24 @@ class Trap(Object):
         self.rect.h = 50
 
 
-class Watches(Object):
-    def __init__(self, x, y, speed):
-        super().__init__("time.png", x, y, speed)
+class Watches(pygame.sprite.Sprite):
+    def __init__(self, x, y, speed_x, speed_y):
+        super().__init__(all_objects)
+        self.image = load_image("time.png")
+        self.rect = self.image.get_rect().move(x, y)
+        self.x = x
+        self.y = y
         self.image = pygame.transform.scale(self.image, (50, 50))
         self.rect.w = 50
         self.rect.h = 50
+        self.speed_x = speed_x
+        self.speed_y = speed_y
+        self.erase = False
+
+    def update(self):
+        self.rect = self.rect.move(self.speed_x, self.speed_y)
+        self.x += self.speed_x
+        self.y += self.speed_y
 
 
 class Player(pygame.sprite.Sprite):
@@ -111,7 +123,7 @@ def first_phase(screen, width, height):
     pygame.event.set_allowed([pygame.QUIT])
     health_count = 1
     traps_count = 0
-    objects = [Health(random.randint(5, 745), -50, 5)]
+    objects = [Health(random.randint(5, 745), -50, 5), Watches(random.randint(5, 745), -50, -5, 5)]
     player = Player("player.png", 400, 417, PLAYER_SPEED, PLAYER_JUMP_SPEED, PLAYER_REBOUND_SPEED)
     first_phase_running = True
     quiting_from_game = False
