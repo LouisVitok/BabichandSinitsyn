@@ -186,9 +186,24 @@ def first_phase(screen, width, height):
             traps_count += 1
         dice = random.uniform(0.1, 100.0)
         if dice <= watches_appearing_chance and watches_count <= watches_max_count:
-            watches_y = random.randint(5, width - 55)
-
-            #  objects.append(Watches(random.randint(5, 745), -50, 5))
+            watches_x = random.randint(-100, width + 105)
+            if watches_x <= -50 or watches_x >= width + 50:
+                watches_y = random.randint(-50, height + 55)
+            else:
+                watches_y = random.randint(-2, 1)
+                if watches_y >= 0:
+                    watches_y = random.randint(height + 50, height + 105)
+                else:
+                    watches_y = random.randint(-105, -50)
+            if watches_x < 0:
+                speed_x = random.randint(2, 5)
+            else:
+                speed_x = random.randint(-5, -2)
+            if watches_y < 0:
+                speed_y = random.randint(2, 5)
+            else:
+                speed_y = random.randint(-5, -2)
+            objects.append(Watches(watches_x, watches_y, speed_x, speed_y))
             watches_count += 1
         for obj_i in range(len(objects)):
             if objects[obj_i].rect.colliderect(player.rect):
