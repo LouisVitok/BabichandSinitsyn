@@ -13,7 +13,7 @@ g = 4  # ускорение свободного падения
 fp_clock = pygame.time.Clock()
 health_appearing_chance = 1.5  # шанс появления здоровья
 trap_appearing_chance = 0.4  # шанс появления ловушек
-watches_appearing_chance = 0.3  # шанс появления часов
+watches_appearing_chance = 12.3  # шанс появления часов
 objects_existing_time = 5  # время жизни объектов на змеле (в секундах)
 health_max_count = 4  # максимальное кол-во здоровья
 traps_max_count = 2  # максимальное кол-во ловушек
@@ -188,13 +188,13 @@ def first_phase(screen, width, height):
         if dice <= watches_appearing_chance and watches_count <= watches_max_count:
             watches_x = random.randint(-100, width + 105)
             if watches_x <= -50 or watches_x >= width + 50:
-                watches_y = random.randint(-50, height + 55)
+                watches_y = random.randint(height // 2.5, height // 1.5)
             else:
                 watches_y = random.randint(-2, 1)
                 if watches_y >= 0:
-                    watches_y = random.randint(height + 50, height + 105)
+                    watches_y = random.randint(height + 105, height + 155)
                 else:
-                    watches_y = random.randint(-105, -50)
+                    watches_y = random.randint(-155, -105)
             if watches_x < 0:
                 speed_x = random.randint(2, 5)
             else:
@@ -244,6 +244,8 @@ def first_phase(screen, width, height):
             start_onesec = 0
         if not time_left:
             return 1
+        if player_health <= 0:
+            return 0
     if quiting_from_game:
         pygame.quit()
         return 0
