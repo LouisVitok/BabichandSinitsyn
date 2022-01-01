@@ -6,29 +6,10 @@ import time
 
 all_objects = pygame.sprite.Group()
 player_group = pygame.sprite.Group()
-TIME = 120  # в секундах
-FPS = 60
-Fg = 0.2  # сила притяжения
-g = 4  # ускорение свободного падения
 fp_clock = pygame.time.Clock()
-health_appearing_chance = 1.5  # шанс появления здоровья
-trap_appearing_chance = 0.4  # шанс появления ловушек
-watches_appearing_chance = 12.3  # шанс появления часов
-objects_existing_time = 5  # время жизни объектов на змеле (в секундах)
-health_max_count = 4  # максимальное кол-во здоровья
-traps_max_count = 2  # максимальное кол-во ловушек
-watches_max_count = 1  # максимальное кол-во часов
-PLAYER_SPEED = 8  # скорость игрока
-PLAYER_JUMP_SPEED = 9  # скорость/ускорения прыжка игрока
-PLAYER_REBOUND_SPEED = 4  # скорость/ускорения отскока игрока по координате x
-PLAYER_HEALTH = 10  # здоровье игрока
-TIMER = 30  # таймер на первую фазу (в секундах)
-HEALTH_TEXT_X = 10
-HEALTH_TEXT_Y = 10
-PLAYER_HEALTH_X = 120
-PLAYER_HEALTH_Y = 10
-TIMER_TEXT_Y = 10
-TIMER_Y = 10
+objects_existing_time = 5
+FPS = 60
+g = 4
 
 
 def load_image(name):
@@ -119,22 +100,25 @@ class Player(pygame.sprite.Sprite):
         self.rect.left -= self.start_speed
 
 
-def first_phase(screen, width, height):
-    time_left = TIMER
-    player_health = PLAYER_HEALTH
+def first_phase_loop(screen, width, height, fp_time, fp_player_health, health_appearing_chance, player_speed,
+                     player_jump_speed, player_rebound_speed, Fg, health_text_x, health_text_y, player_health_x,
+                     player_health_y, timer_y, health_max_count, trap_appearing_chance, traps_max_count,
+                     watches_appearing_chance, watches_max_count):
+    time_left = fp_time
+    player_health = fp_player_health
     pygame.event.set_allowed([pygame.QUIT])
     health_count = 1
     traps_count = 0
     watches_count = 0
     objects = [Health(random.randint(5, width - 55), -50, 5)]
-    player = Player("player.png", 400, 417, PLAYER_SPEED, PLAYER_JUMP_SPEED, PLAYER_REBOUND_SPEED)
+    player = Player("player.png", 400, 417, player_speed, player_jump_speed, player_rebound_speed)
     first_phase_running = True
     quiting_from_game = False
     background = pygame.transform.scale(load_image('zastavka.jpg'), (width, height))
     health_text = pygame.font.Font(None, 30).render('Здоровье:', True, (255, 0, 0))
-    player_health_text = pygame.font.Font(None, 30).render(str(PLAYER_HEALTH), True, (255, 0, 0))
+    player_health_text = pygame.font.Font(None, 30).render(str(fp_player_health), True, (255, 0, 0))
     timer_text = pygame.font.Font(None, 30).render('Время:', True, (130, 131, 133))
-    seconds_timer_text = pygame.font.Font(None, 30).render(str(TIMER), True, (130, 131, 133))
+    seconds_timer_text = pygame.font.Font(None, 30).render(str(fp_time), True, (130, 131, 133))
     start_onesec = 0
     while first_phase_running:
         if not start_onesec:
@@ -167,10 +151,10 @@ def first_phase(screen, width, height):
                 player.current_jump_speed = player.start_jump_speed
                 player.rebound_direction = 0
         screen.blit(background, (0, 0))
-        screen.blit(health_text, (HEALTH_TEXT_X, HEALTH_TEXT_Y))
-        screen.blit(player_health_text, (PLAYER_HEALTH_X, PLAYER_HEALTH_Y))
-        screen.blit(timer_text, (width - 115, TIMER_Y))
-        screen.blit(seconds_timer_text, (width - 35, TIMER_Y))
+        screen.blit(health_text, (health_text_x, health_text_y))
+        screen.blit(player_health_text, (player_health_x, player_health_y))
+        screen.blit(timer_text, (width - 115, timer_y))
+        screen.blit(seconds_timer_text, (width - 35, timer_y))
         all_objects.draw(screen)
         all_objects.update()
         player_group.draw(screen)
