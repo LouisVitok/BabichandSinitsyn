@@ -57,6 +57,14 @@ class Trap(Object):
         self.rect.h = 50
 
 
+class SpeedBooster(Object):
+    def __init__(self, x, y, speed):
+        super().__init__("booster_speed.png", x, y, speed)
+        self.image = pygame.transform.scale(self.image, (50, 50))
+        self.rect.w = 50
+        self.rect.h = 50
+
+
 class Watches(pygame.sprite.Sprite):
     def __init__(self, x, y, speed_x, speed_y):
         super().__init__(all_objects)
