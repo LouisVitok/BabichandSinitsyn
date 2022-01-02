@@ -111,13 +111,14 @@ class Player(pygame.sprite.Sprite):
 def first_phase_loop(screen, width, height, fp_time, fp_player_health, health_appearing_chance, player_speed,
                      player_jump_speed, player_rebound_speed, Fg, health_text_x, health_text_y, player_health_x,
                      player_health_y, timer_y, health_max_count, trap_appearing_chance, traps_max_count,
-                     watches_appearing_chance, watches_max_count):
+                     watches_appearing_chance, watches_max_count, boosters_appearing_chance, boosters_max_count):
     time_left = fp_time
     player_health = fp_player_health
     pygame.event.set_allowed([pygame.QUIT])
     health_count = 1
     traps_count = 0
     watches_count = 0
+    boosters_count = 0
     objects = [Health(random.randint(5, width - 55), -50, 5)]
     player = Player("player.png", 400, 417, player_speed, player_jump_speed, player_rebound_speed)
     first_phase_running = True
@@ -169,15 +170,15 @@ def first_phase_loop(screen, width, height, fp_time, fp_player_health, health_ap
         pygame.display.flip()
         fp_clock.tick(FPS)
         dice = random.uniform(1.0, 100.0)
-        if dice <= health_appearing_chance and health_count <= health_max_count:
+        if dice <= health_appearing_chance and health_count < health_max_count:
             objects.append(Health(random.randint(5, width - 55), -50, 5))
             health_count += 1
         dice = random.uniform(0.1, 100.0)
-        if dice <= trap_appearing_chance and traps_count <= traps_max_count:
+        if dice <= trap_appearing_chance and traps_count < traps_max_count:
             objects.append(Trap(random.randint(5, width - 55), -50, 5))
             traps_count += 1
         dice = random.uniform(0.1, 100.0)
-        if dice <= watches_appearing_chance and watches_count <= watches_max_count:
+        if dice <= watches_appearing_chance and watches_count < watches_max_count:
             watches_x = random.randint(-100, width + 105)
             if watches_x <= -50 or watches_x >= width + 50:
                 watches_y = random.randint(height // 2.5, height // 1.5)
@@ -197,6 +198,9 @@ def first_phase_loop(screen, width, height, fp_time, fp_player_health, health_ap
                 speed_y = random.randint(-5, -2)
             objects.append(Watches(watches_x, watches_y, speed_x, speed_y))
             watches_count += 1
+        dice = random.uniform(0.1, 100.0)
+        if dice <= boosters_appearing_chance and boosters_count < boosters_max_count:
+            objects.append(SpeedBooster(random.randint(5, 745), -50, 5))
         for obj_i in range(len(objects)):
             if objects[obj_i].rect.colliderect(player.rect):
                 if type(objects[obj_i]) == Health:
