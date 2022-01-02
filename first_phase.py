@@ -236,7 +236,7 @@ def first_phase_loop(screen, width, height, fp_time, fp_player_health, health_ap
                 objects.pop(obj_i)
                 break
         if time.perf_counter() - start_onesec >= 1:
-            time_left -= 1
+            time_left -= game_speed
             seconds_timer_text = pygame.font.Font(None, 30).render(str(time_left), True, (130, 131, 133))
             start_onesec = 0
         if not time_left:
