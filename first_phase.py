@@ -30,14 +30,14 @@ class Object(pygame.sprite.Sprite):
         self.current_time = 0
         self.erase = False
 
-    def update(self):
+    def update(self, game_speed):
         if self.on_ground:
             self.current_time = time.perf_counter()
-            if self.current_time - self.start_time >= float(objects_existing_time):
+            if self.current_time - self.start_time >= float(objects_existing_time // game_speed):
                 self.erase = True
         if self.rect.top <= 415:
-            self.rect = self.rect.move(0, self.current_speed / FPS + g)
-            self.y += self.current_speed / FPS + g
+            self.rect = self.rect.move(0, self.current_speed * game_speed / FPS + g)
+            self.y += self.current_speed * game_speed / FPS + g
             self.current_speed += g
         elif not self.on_ground:
             self.on_ground = True
@@ -79,10 +79,10 @@ class Watches(pygame.sprite.Sprite):
         self.speed_y = speed_y
         self.erase = False
 
-    def update(self):
-        self.rect = self.rect.move(self.speed_x, self.speed_y)
-        self.x += self.speed_x
-        self.y += self.speed_y
+    def update(self, game_speed):
+        self.rect = self.rect.move(self.speed_x * game_speed, self.speed_y * game_speed)
+        self.x += self.speed_x * game_speed
+        self.y += self.speed_y * game_speed
 
 
 class Player(pygame.sprite.Sprite):
@@ -101,11 +101,11 @@ class Player(pygame.sprite.Sprite):
         self.rebound_speed = rebound_speed
         self.rebound_direction = 0
 
-    def go_right(self):
-        self.rect.left += self.start_speed
+    def go_right(self, game_speed):
+        self.rect.left += self.start_speed * game_speed
 
-    def go_left(self):
-        self.rect.left -= self.start_speed
+    def go_left(self, game_speed):
+        self.rect.left -= self.start_speed * game_speed
 
 
 def first_phase_loop(screen, width, height, fp_time, fp_player_health, health_appearing_chance, player_speed,
@@ -119,6 +119,7 @@ def first_phase_loop(screen, width, height, fp_time, fp_player_health, health_ap
     traps_count = 0
     watches_count = 0
     boosters_count = 0
+    game_speed = 1
     objects = [Health(random.randint(5, width - 55), -50, 5)]
     player = Player("player.png", 400, 417, player_speed, player_jump_speed, player_rebound_speed)
     first_phase_running = True
@@ -138,22 +139,22 @@ def first_phase_loop(screen, width, height, fp_time, fp_player_health, health_ap
                 quiting_from_game = True
             if pygame.KEYDOWN:
                 if pygame.key.get_pressed()[pygame.K_a] and not player.rebound:
-                    player.go_left()
+                    player.go_left(game_speed)
                 if pygame.key.get_pressed()[pygame.K_d] and not player.rebound:
-                    player.go_right()
+                    player.go_right(game_speed)
             if pygame.key.get_pressed():
                 if (pygame.key.get_pressed()[pygame.K_w] or pygame.key.get_pressed()[pygame.K_SPACE])\
                         and not player.rebound:
                     player.jumping = True
         if player.jumping:
-            player.rect.top -= player.current_jump_speed
+            player.rect.top -= player.current_jump_speed * game_speed
             player.current_jump_speed -= Fg
             if player.rect.top >= 417:
                 player.jumping = False
                 player.current_jump_speed = player.start_jump_speed
         if player.rebound:
-            player.rect.top -= player.current_jump_speed // 2
-            player.rect.left += player.rebound_speed * player.rebound_direction
+            player.rect.top -= player.current_jump_speed * game_speed // 2
+            player.rect.left += player.rebound_speed * game_speed * player.rebound_direction
             player.current_jump_speed -= Fg
             if player.rect.top >= 417:
                 player.rebound = False
@@ -165,7 +166,7 @@ def first_phase_loop(screen, width, height, fp_time, fp_player_health, health_ap
         screen.blit(timer_text, (width - 115, timer_y))
         screen.blit(seconds_timer_text, (width - 35, timer_y))
         all_objects.draw(screen)
-        all_objects.update()
+        all_objects.update(game_speed)
         player_group.draw(screen)
         pygame.display.flip()
         fp_clock.tick(FPS)
