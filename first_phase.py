@@ -108,6 +108,19 @@ class Player(pygame.sprite.Sprite):
         self.rect.left -= self.start_speed * game_speed
 
 
+class RegularSprite(pygame.sprite.Sprite):
+    def __init__(self, image, width, height, x, y):
+        if hasattr(RegularSprite, "sprites_group"):
+            RegularSprite.sprites_group = pygame.sprite.Group()
+        super().__init__(RegularSprite.sprites_group)
+        self.image = pygame.transform.scale(load_image(image), (width, height))
+        self.rect = self.image.get_rect().move(x, y)
+        self.rect.w = width
+        self.rect.h = height
+        self.x = x
+        self.y = y
+
+
 def first_phase_loop(screen, width, height, fp_time, fp_player_health, health_appearing_chance, player_speed,
                      player_jump_speed, player_rebound_speed, Fg, health_text_x, health_text_y, player_health_x,
                      player_health_y, timer_y, health_max_count, trap_appearing_chance, traps_max_count,
@@ -124,12 +137,16 @@ def first_phase_loop(screen, width, height, fp_time, fp_player_health, health_ap
     player = Player("player.png", 400, 417, player_speed, player_jump_speed, player_rebound_speed)
     first_phase_running = True
     quiting_from_game = False
+    speed_booster_new = False
+    speed_booster_continue = False
     background = pygame.transform.scale(load_image('zastavka.jpg'), (width, height))
     health_text = pygame.font.Font(None, 30).render('Здоровье:', True, (255, 0, 0))
     player_health_text = pygame.font.Font(None, 30).render(str(fp_player_health), True, (255, 0, 0))
     timer_text = pygame.font.Font(None, 30).render('Время:', True, (130, 131, 133))
     seconds_timer_text = pygame.font.Font(None, 30).render(str(fp_time), True, (130, 131, 133))
+    speed_booster_img = pygame.sprite.Sprite()
     start_onesec = 0
+    start_speed_booster = 0
     while first_phase_running:
         if not start_onesec:
             start_onesec = time.perf_counter()
@@ -220,6 +237,10 @@ def first_phase_loop(screen, width, height, fp_time, fp_player_health, health_ap
                     objects[obj_i].erase = True
                     time_left += 3
                     seconds_timer_text = pygame.font.Font(None, 30).render(str(time_left), True, (130, 131, 133))
+                if type(objects[obj_i]) == SpeedBooster:
+                    start_speed_booster = time.perf_counter()
+                    speed_booster_continue = True
+                    game_speed = 3
             if type(objects[obj_i]) == Watches:
                 if objects[obj_i].x <= -150 or objects[obj_i].x >= width + 175:
                     objects[obj_i].erase = True
@@ -235,10 +256,16 @@ def first_phase_loop(screen, width, height, fp_time, fp_player_health, health_ap
                 all_objects.remove(objects[obj_i])
                 objects.pop(obj_i)
                 break
-        if time.perf_counter() - start_onesec >= 1:
-            time_left -= game_speed
+        if time.perf_counter() - start_onesec >= 1 / game_speed:
+            time_left -= 1
             seconds_timer_text = pygame.font.Font(None, 30).render(str(time_left), True, (130, 131, 133))
             start_onesec = 0
+        if speed_booster_continue:
+
+        if speed_booster_new:
+            start_speed_booster = time.perf_counter()
+            speed_booster_new = False
+            speed_booster_continue = True
         if not time_left:
             return 1
         if player_health <= 0:
