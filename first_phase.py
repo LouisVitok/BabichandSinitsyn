@@ -266,7 +266,7 @@ class FirstPhase:
                         start_speed_booster = time.perf_counter()
                         speed_booster_continue = True
                         game_speed = 3
-                        regular_sprites.append(RegularSprite("speed_booster.png", 50, 50, 5, 421))
+                        regular_sprites.append(RegularSprite("booster_speed.png", 50, 50, 5, 421))
                 if type(objects[obj_i]) == Watches:
                     if objects[obj_i].x <= -150 or objects[obj_i].x >= self.width + 175:
                         objects[obj_i].erase = True
@@ -286,10 +286,10 @@ class FirstPhase:
                 time_left -= 1
                 seconds_timer_text = pygame.font.Font(None, 30).render(str(time_left), True, (130, 131, 133))
                 start_onesec = 0
-            if speed_booster_new:
-                start_speed_booster = time.perf_counter()
-                speed_booster_new = False
-                speed_booster_continue = True
+            if speed_booster_continue:
+                if time.perf_counter() - speed_booster_continue >= 5.00:
+                    speed_booster_continue = False
+                    game_speed = 1
             if not time_left:
                 return 1
             if player_health <= 0:
