@@ -209,8 +209,6 @@ class FirstPhase:
             screen.blit(seconds_timer_text, (self.width - 35, self.timer_y))
             Object.group.draw(screen)
             Object.group.update(game_speed)
-            all_objects.draw(screen)
-            all_objects.update(game_speed)
             Player.group.draw(screen)
             pygame.display.flip()
             fp_clock.tick(FPS)
