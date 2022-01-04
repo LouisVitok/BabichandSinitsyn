@@ -1,7 +1,7 @@
 import os
 import pygame
 import sys
-from first_phase import first_phase_loop
+from first_phase import FirstPhase
 
 FPS = 60
 
@@ -69,10 +69,11 @@ if __name__ == '__main__':
     clock = pygame.time.Clock()
     start_screen(800, 600)
 
-    if first_phase_loop(screen, width, height, TIME, PLAYER_HEALTH, health_appearing_chance, PLAYER_SPEED, PLAYER_JUMP_SPEED,
-                   PLAYER_JUMP_SPEED, Fg, HEALTH_TEXT_X, HEALTH_TEXT_Y, PLAYER_HEALTH_X, PLAYER_HEALTH_Y, TIMER_Y,
-                   health_max_count, trap_appearing_chance, traps_max_count, watches_appearing_chance,
-                   watches_max_count, boosters_appearing_chance, boosters_max_count):
+    first_phase = FirstPhase(width, height, TIME, PLAYER_HEALTH, health_appearing_chance, PLAYER_SPEED,
+                             PLAYER_JUMP_SPEED, PLAYER_REBOUND_SPEED, Fg, HEALTH_TEXT_X, HEALTH_TEXT_Y, PLAYER_HEALTH_X,
+                             PLAYER_HEALTH_Y, TIMER_Y, health_max_count, trap_appearing_chance, traps_max_count,
+                             watches_appearing_chance, watches_max_count, boosters_appearing_chance, boosters_max_count)
+    if first_phase.loop(screen):
         running = True
         x_pos = 0
         v = 30
