@@ -170,8 +170,11 @@ class FirstPhase:
         player_health_text = pygame.font.Font(None, 30).render(str(self.fp_player_health), True, (255, 0, 0))
         timer_text = pygame.font.Font(None, 30).render('Время:', True, (130, 131, 133))
         seconds_timer_text = pygame.font.Font(None, 30).render(str(self.fp_time), True, (130, 131, 133))
+        score_text = pygame.font.Font(None, 30).render("0", True, (255, 255, 0))
         start_onesec = 0
         start_speed_booster = 0
+        player_score = 0
+        score_gaining_multiply = 1
         while first_phase_running:
             if not start_onesec:
                 start_onesec = time.perf_counter()
@@ -207,6 +210,7 @@ class FirstPhase:
             screen.blit(player_health_text, (self.player_health_x, self.player_health_y))
             screen.blit(timer_text, (self.width - 115, self.timer_y))
             screen.blit(seconds_timer_text, (self.width - 35, self.timer_y))
+            screen.blit(score_text, (self.width // 2 - score_text.get_width() // 2, 5))
             Object.group.draw(screen)
             Object.group.update(game_speed)
             Player.group.draw(screen)
@@ -248,6 +252,8 @@ class FirstPhase:
                 if objects[obj_i].rect.colliderect(player.rect):
                     if type(objects[obj_i]) == Health:
                         player_health += 1
+                        player_score += 1 * score_gaining_multiply
+                        score_text = pygame.font.Font(None, 30).render(str(player_score), True, (255, 255, 0))
                         player_health_text = pygame.font.Font(None, 30).render(str(player_health), True, (255, 0, 0))
                         objects[obj_i].erase = True
                     if type(objects[obj_i]) == Trap:
@@ -258,14 +264,23 @@ class FirstPhase:
                             player.rebound_direction = -1
                         player_health -= 1
                         player_health_text = pygame.font.Font(None, 30).render(str(player_health), True, (255, 0, 0))
+                        if player_score >= 3:
+                            player_score -= 3 * score_gaining_multiply
+                            score_text = pygame.font.Font(None, 30).render(str(player_score), True, (255, 255, 0))
+                        else:
+                            player_score = 0
+                            score_text = pygame.font.Font(None, 30).render(str(player_score), True, (255, 255, 0))
                     if type(objects[obj_i]) == Watches:
                         objects[obj_i].erase = True
                         time_left += 5
                         seconds_timer_text = pygame.font.Font(None, 30).render(str(time_left), True, (130, 131, 133))
+                        player_score += 2 * score_gaining_multiply
+                        score_text = pygame.font.Font(None, 30).render(str(player_score), True, (255, 255, 0))
                     if type(objects[obj_i]) == SpeedBooster:
                         start_speed_booster = time.perf_counter()
                         speed_booster_continue = True
-                        game_speed = 3
+                        game_speed = 2
+                        score_gaining_multiply = 3
                         regular_sprites.append(RegularSprite("booster_speed.png", 50, 50, 5, 421))
                 if type(objects[obj_i]) == Watches:
                     if objects[obj_i].x <= -150 or objects[obj_i].x >= self.width + 175:
@@ -287,9 +302,11 @@ class FirstPhase:
                 seconds_timer_text = pygame.font.Font(None, 30).render(str(time_left), True, (130, 131, 133))
                 start_onesec = 0
             if speed_booster_continue:
-                if time.perf_counter() - speed_booster_continue >= 5.00:
+                if time.perf_counter() - start_speed_booster >= 5.00:
                     speed_booster_continue = False
                     game_speed = 1
+                    score_gaining_multiply = 1
+                    print(time.perf_counter(), start_speed_booster)
             if not time_left:
                 return 1
             if player_health <= 0:
