@@ -67,13 +67,9 @@ class SpeedBooster(Object):
         self.rect.h = 50
 
 
-class Watches(pygame.sprite.Sprite):
+class Watches(Object):
     def __init__(self, x, y, speed_x, speed_y):
-        super().__init__(all_objects)
-        self.image = load_image("time.png")
-        self.rect = self.image.get_rect().move(x, y)
-        self.x = x
-        self.y = y
+        super().__init__("time.png", x, y, speed_x)
         self.image = pygame.transform.scale(self.image, (50, 50))
         self.rect.w = 50
         self.rect.h = 50
@@ -285,7 +281,7 @@ class FirstPhase:
                         traps_count -= 1
                     if type(objects[obj_i]) == Watches:
                         watches_count -= 1
-                    Object.group.remove(objects[obj_i])
+                    Object.group.remove(objects[obj_i])aaaaa
                     objects.pop(obj_i)
                     break
             if time.perf_counter() - start_onesec >= 1 / game_speed:
