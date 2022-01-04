@@ -281,7 +281,7 @@ class FirstPhase:
                         traps_count -= 1
                     if type(objects[obj_i]) == Watches:
                         watches_count -= 1
-                    Object.group.remove(objects[obj_i])aaaaa
+                    Object.group.remove(objects[obj_i])
                     objects.pop(obj_i)
                     break
             if time.perf_counter() - start_onesec >= 1 / game_speed:
