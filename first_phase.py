@@ -149,7 +149,6 @@ class FirstPhase:
         self.boosters_max_count = boosters_max_count
 
     def loop(self, screen):
-        print(1)
         time_left = self.fp_time
         player_health = self.fp_player_health
         pygame.event.set_allowed([pygame.QUIT])
