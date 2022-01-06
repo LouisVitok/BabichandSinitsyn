@@ -90,8 +90,7 @@ class Player(pygame.sprite.Sprite):
         super().__init__(Player.group)
         self.x = x
         self.y = y
-        self.start_speed = speed
-        self.current_speed = speed
+        self.current_speed = 0
         self.start_jump_speed = jump_speed
         self.current_jump_speed = jump_speed
         self.jumping = False
@@ -101,11 +100,14 @@ class Player(pygame.sprite.Sprite):
         self.rebound_speed = rebound_speed
         self.rebound_direction = 0
 
-    def go_right(self, game_speed):
-        self.rect.left += self.start_speed * game_speed
+    def force(self, x):
+        self.current_speed += x
 
-    def go_left(self, game_speed):
-        self.rect.left -= self.start_speed * game_speed
+    def move(self, x, y):
+        self.rect.x += x
+        self.x += x
+        self.rect.y += y
+        self.y += y
 
 
 class RegularSprite(pygame.sprite.Sprite):
@@ -183,9 +185,16 @@ class FirstPhase:
                     quiting_from_game = True
                 if pygame.KEYDOWN:
                     if pygame.key.get_pressed()[pygame.K_a] and not player.rebound:
-                        player.go_left(game_speed)
-                    if pygame.key.get_pressed()[pygame.K_d] and not player.rebound:
-                        player.go_right(game_speed)
+                        player.force(-0.25)
+                    elif pygame.key.get_pressed()[pygame.K_d] and not player.rebound:
+                        player.force(0.25)
+                    else:
+                        if player.current_speed > 0.25:
+                            player.current_speed -= 0.25
+                        elif player.current_speed < -0.25:
+                            player.current_speed += 0.25
+                        else:
+                            player.current_speed = 0
                 if pygame.key.get_pressed():
                     if (pygame.key.get_pressed()[pygame.K_w] or pygame.key.get_pressed()[pygame.K_SPACE])\
                             and not player.rebound:
@@ -204,6 +213,7 @@ class FirstPhase:
                     player.rebound = False
                     player.current_jump_speed = player.start_jump_speed
                     player.rebound_direction = 0
+            player.move(player.current_speed, 0)
             screen.blit(background, (0, 0))
             screen.blit(health_text, (self.health_text_x, self.health_text_y))
             screen.blit(player_health_text, (self.player_health_x, self.player_health_y))
@@ -305,7 +315,6 @@ class FirstPhase:
                     speed_booster_continue = False
                     game_speed = 1
                     score_gaining_multiply = 1
-                    print(time.perf_counter(), start_speed_booster)
             if not time_left:
                 return 1
             if player_health <= 0:
