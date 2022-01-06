@@ -267,10 +267,16 @@ class FirstPhase:
                         objects[obj_i].erase = True
                     if type(objects[obj_i]) == Trap:
                         player.rebound = True
+                        if abs(player.current_speed) >= 1:
+                            player.rebound_speed = abs(player.current_speed)
+                        else:
+                            player.rebound_speed = 1
+                        player.current_speed = 0
                         if objects[obj_i].rect.x < player.rect.x:
                             player.rebound_direction = 1
                         elif objects[obj_i].rect.x > player.rect.x:
                             player.rebound_direction = -1
+                        print(player.rebound_speed, player.rebound_direction)
                         player_health -= 1
                         player_health_text = pygame.font.Font(None, 30).render(str(player_health), True, (255, 0, 0))
                         if player_score >= 3:
