@@ -178,6 +178,8 @@ class FirstPhase:
         start_speed_booster = 0
         player_score = 0
         score_gaining_multiply = 1
+        touched = False
+        touched_time = 0
         while first_phase_running:
             if not start_onesec:
                 start_onesec = time.perf_counter()
@@ -262,7 +264,7 @@ class FirstPhase:
             if dice <= self.boosters_appearing_chance and boosters_count < self.boosters_max_count:
                 objects.append(SpeedBooster(random.randint(5, 745), -50, 5))
             for obj_i in range(len(objects)):
-                if objects[obj_i].rect.colliderect(player.rect):
+                if objects[obj_i].rect.colliderect(player.rect) and not touched:
                     if type(objects[obj_i]) == Health:
                         player_health += 1
                         player_score += 1 * score_gaining_multiply
@@ -270,6 +272,8 @@ class FirstPhase:
                         player_health_text = pygame.font.Font(None, 30).render(str(player_health), True, (255, 0, 0))
                         objects[obj_i].erase = True
                     if type(objects[obj_i]) == Trap:
+                        touched_time = time.perf_counter()
+                        touched = True
                         player.rebound = True
                         if abs(player.current_speed) >= 1:
                             player.rebound_speed = abs(player.current_speed)
@@ -319,6 +323,8 @@ class FirstPhase:
                 time_left -= 1
                 seconds_timer_text = pygame.font.Font(None, 30).render(str(time_left), True, (130, 131, 133))
                 start_onesec = 0
+            if touched and time.perf_counter() - touched_time >= 3.00:
+                touched = False
             if speed_booster_continue:
                 if time.perf_counter() - start_speed_booster >= 5.00:
                     speed_booster_continue = False
