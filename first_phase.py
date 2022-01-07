@@ -3,7 +3,6 @@ import os
 import random
 import time
 
-
 all_objects = pygame.sprite.Group()
 player_group = pygame.sprite.Group()
 fp_clock = pygame.time.Clock()
@@ -104,8 +103,11 @@ class Player(pygame.sprite.Sprite):
         self.current_speed += x
 
     def move(self, x, y):
-        self.rect.x += x
-        self.x += x
+        if 0 < self.rect.x + x < pygame.display.get_surface().get_width() - self.rect.w:
+            self.rect.x += x
+            self.x += x
+        else:
+            self.current_speed = 0
         self.rect.y += y
         self.y += y
 
@@ -125,9 +127,9 @@ class RegularSprite(pygame.sprite.Sprite):
 
 class FirstPhase:
     def __init__(self, width, height, fp_time, fp_player_health, health_appearing_chance, player_speed,
-                     player_jump_speed, player_rebound_speed, Fg, health_text_x, health_text_y, player_health_x,
-                     player_health_y, timer_y, health_max_count, trap_appearing_chance, traps_max_count,
-                     watches_appearing_chance, watches_max_count, boosters_appearing_chance, boosters_max_count):
+                 player_jump_speed, player_rebound_speed, Fg, health_text_x, health_text_y, player_health_x,
+                 player_health_y, timer_y, health_max_count, trap_appearing_chance, traps_max_count,
+                 watches_appearing_chance, watches_max_count, boosters_appearing_chance, boosters_max_count):
         self.width = width
         self.height = height
         self.fp_time = fp_time
@@ -196,7 +198,7 @@ class FirstPhase:
                         else:
                             player.current_speed = 0
                 if pygame.key.get_pressed():
-                    if (pygame.key.get_pressed()[pygame.K_w] or pygame.key.get_pressed()[pygame.K_SPACE])\
+                    if (pygame.key.get_pressed()[pygame.K_w] or pygame.key.get_pressed()[pygame.K_SPACE]) \
                             and not player.rebound:
                         player.jumping = True
             if player.jumping:
@@ -207,7 +209,9 @@ class FirstPhase:
                     player.current_jump_speed = player.start_jump_speed
             if player.rebound:
                 player.rect.top -= player.current_jump_speed * game_speed // 2
-                player.rect.left += player.rebound_speed * game_speed * player.rebound_direction
+                if 0 < player.rect.x + player.rebound_speed * game_speed * player.rebound_direction < \
+                        pygame.display.get_surface().get_width() - player.rect.w:
+                    player.rect.left += player.rebound_speed * game_speed * player.rebound_direction
                 player.current_jump_speed -= self.Fg
                 if player.rect.top >= 417:
                     player.rebound = False
@@ -276,7 +280,6 @@ class FirstPhase:
                             player.rebound_direction = 1
                         elif objects[obj_i].rect.x > player.rect.x:
                             player.rebound_direction = -1
-                        print(player.rebound_speed, player.rebound_direction)
                         player_health -= 1
                         player_health_text = pygame.font.Font(None, 30).render(str(player_health), True, (255, 0, 0))
                         if player_score >= 3:
