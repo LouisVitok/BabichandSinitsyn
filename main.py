@@ -37,15 +37,16 @@ def load_image(name):
 
 
 def start_screen(width, height):
-    intro = ['Нажмите клавишу']
+    intro = ['Выберите сложность', 'Легко', 'Нормально', 'Сложно']
     background = pygame.transform.scale(load_image('zastavka.jpg'), (width, height))
     screen.blit(background, (0, 0))
+    y = 5
     for line in intro:
         s = pygame.font.Font(None, 70).render(line, True, (250, 250, 210))
         rect = s.get_rect()
-        rect.x = width // 2 - 220
-        rect.y = height // 2 - 30
-        screen.blit(s, (rect.x, rect.y))
+        rect.x = width // 2 - rect.w // 2
+        screen.blit(s, (rect.x, y))
+        y += height // 4
     running = True
     while running:
         for event in pygame.event.get():
