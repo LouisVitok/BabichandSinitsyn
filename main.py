@@ -10,8 +10,8 @@ TIME = 120  # # таймер на первую фазу (в секундах)
 Fg = 0.2  # сила притяжения
 g = 4  # ускорение свободного падения
 health_appearing_chance = 1.5  # шанс появления здоровья
-trap_appearing_chance = 0.0000008  # шанс появления ловушек
-watches_appearing_chance = 0.0003  # шанс появления часов
+trap_appearing_chance = 0.08  # шанс появления ловушек
+watches_appearing_chance = 0.6  # шанс появления часов
 boosters_appearing_chance = 0.2  # шанс появления бустеров
 objects_existing_time = 5  # время жизни объектов на змеле (в секундах)
 health_max_count = 4  # максимальное кол-во здоровья
@@ -96,10 +96,10 @@ if __name__ == '__main__':
     clock = pygame.time.Clock()
     diff = start_screen(width, height)
 
-    first_phase = FirstPhase(width, height, int(TIME // diff), int(PLAYER_HEALTH // diff), health_appearing_chance,
+    first_phase = FirstPhase(width, height, int(TIME // diff), int(PLAYER_HEALTH // diff), health_appearing_chance // diff,
                              PLAYER_SPEED, PLAYER_JUMP_SPEED, PLAYER_REBOUND_SPEED, Fg, HEALTH_TEXT_X, HEALTH_TEXT_Y,
-                             PLAYER_HEALTH_X, PLAYER_HEALTH_Y, TIMER_Y, health_max_count, trap_appearing_chance // diff,
-                             traps_max_count, watches_appearing_chance, watches_max_count, boosters_appearing_chance,
+                             PLAYER_HEALTH_X, PLAYER_HEALTH_Y, TIMER_Y, health_max_count, trap_appearing_chance * diff,
+                             traps_max_count, watches_appearing_chance // diff, watches_max_count, boosters_appearing_chance,
                              boosters_max_count)
     if first_phase.loop(screen):
         running = True
