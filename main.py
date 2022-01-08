@@ -10,7 +10,7 @@ TIME = 120  # # таймер на первую фазу (в секундах)
 Fg = 0.2  # сила притяжения
 g = 4  # ускорение свободного падения
 health_appearing_chance = 1.5  # шанс появления здоровья
-trap_appearing_chance = 0.8  # шанс появления ловушек
+trap_appearing_chance = 0.0000008  # шанс появления ловушек
 watches_appearing_chance = 0.0003  # шанс появления часов
 boosters_appearing_chance = 0.2  # шанс появления бустеров
 objects_existing_time = 5  # время жизни объектов на змеле (в секундах)
@@ -38,17 +38,18 @@ def load_image(name):
 
 def start_screen(width, height):
     intro = ['Выберите сложность', 'Легко', 'Нормально', 'Сложно']
-    rectangles = []
+    fonts = []
     background = pygame.transform.scale(load_image('zastavka.jpg'), (width, height))
     screen.blit(background, (0, 0))
     y = 5
     for line in intro:
         s = pygame.font.Font(None, 70).render(line, True, (250, 250, 210))
         rect = s.get_rect()
-        rectangles.append(rect)
         rect.x = width // 2 - rect.w // 2
-        screen.blit(s, (rect.x, y))
+        rect.y = y
         y += height // 4
+        fonts.append(s)
+        screen.blit(s, (rect.x, rect.y))
     running = True
     while running:
         for event in pygame.event.get():
@@ -57,17 +58,25 @@ def start_screen(width, height):
                 sys.exit()
                 return
             if event.type == pygame.KEYDOWN or event.type == pygame.MOUSEBUTTONDOWN:
-                return
-        screen.blit(background, (0, 0))
+                y = 5
+                for i in range(len(fonts)):
+                    rect = fonts[i].get_rect()
+                    rect.x = width // 2 - rect.w // 2
+                    rect.y = y
+                    if rect.collidepoint(pygame.mouse.get_pos()) and i != 0:
+                        print(intro[i])
+                        return
+                    y += height // 4
+        # screen.blit(background, (0, 0))
         for i in range(len(intro)):
-            if rectangles[i].collidepoint(pygame.mouse.get_pos()) and i != 0:
+            if fonts[i].get_rect().collidepoint(pygame.mouse.get_pos()):
                 color = (255, 10, 10)
             else:
                 color = (250, 250, 210)
-            s = pygame.font.Font(None, 70).render(intro[i], True, color)
-            rect = s.get_rect()
-            rect.x = width // 2 - rect.w // 2
-            screen.blit(s, (rect.x, y))
+            rect = fonts[i].get_rect()
+            x = width // 2 - rect.w // 2
+            screen.blit(fonts[i], (x, y))
+            pygame.display.flip()
             y += height // 4
         pygame.display.flip()
         clock.tick(FPS)
@@ -81,7 +90,7 @@ if __name__ == '__main__':
     # pygame.mixer.music.load("sound2.mp3")
     # pygame.mixer.music.play(-1)
     clock = pygame.time.Clock()
-    start_screen(800, 600)
+    start_screen(width, height)
 
     first_phase = FirstPhase(width, height, TIME, PLAYER_HEALTH, health_appearing_chance, PLAYER_SPEED,
                              PLAYER_JUMP_SPEED, PLAYER_REBOUND_SPEED, Fg, HEALTH_TEXT_X, HEALTH_TEXT_Y, PLAYER_HEALTH_X,
