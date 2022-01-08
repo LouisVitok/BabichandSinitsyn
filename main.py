@@ -21,7 +21,7 @@ boosters_max_count = 1  # максимальное кол-во бустеров
 PLAYER_SPEED = 8  # скорость игрока
 PLAYER_JUMP_SPEED = 9  # скорость/ускорения прыжка игрока
 PLAYER_REBOUND_SPEED = 3  # скорость/ускорения отскока игрока по координате x
-PLAYER_HEALTH = 100000  # здоровье игрока
+PLAYER_HEALTH = 10  # здоровье игрока
 HEALTH_TEXT_X = 10
 HEALTH_TEXT_Y = 10
 PLAYER_HEALTH_X = 120
@@ -64,8 +64,12 @@ def start_screen(width, height):
                     rect.x = width // 2 - rect.w // 2
                     rect.y = y
                     if rect.collidepoint(pygame.mouse.get_pos()) and i != 0:
-                        print(intro[i])
-                        return
+                        if intro[i] == 'Легко':
+                            return 1
+                        if intro[i] == 'Нормально':
+                            return 1.5
+                        if intro[i] == 'Сложно':
+                            return 3
                     y += height // 4
         # screen.blit(background, (0, 0))
         for i in range(len(intro)):
@@ -90,12 +94,13 @@ if __name__ == '__main__':
     # pygame.mixer.music.load("sound2.mp3")
     # pygame.mixer.music.play(-1)
     clock = pygame.time.Clock()
-    start_screen(width, height)
+    diff = start_screen(width, height)
 
-    first_phase = FirstPhase(width, height, TIME, PLAYER_HEALTH, health_appearing_chance, PLAYER_SPEED,
-                             PLAYER_JUMP_SPEED, PLAYER_REBOUND_SPEED, Fg, HEALTH_TEXT_X, HEALTH_TEXT_Y, PLAYER_HEALTH_X,
-                             PLAYER_HEALTH_Y, TIMER_Y, health_max_count, trap_appearing_chance, traps_max_count,
-                             watches_appearing_chance, watches_max_count, boosters_appearing_chance, boosters_max_count)
+    first_phase = FirstPhase(width, height, int(TIME // diff), int(PLAYER_HEALTH // diff), health_appearing_chance,
+                             PLAYER_SPEED, PLAYER_JUMP_SPEED, PLAYER_REBOUND_SPEED, Fg, HEALTH_TEXT_X, HEALTH_TEXT_Y,
+                             PLAYER_HEALTH_X, PLAYER_HEALTH_Y, TIMER_Y, health_max_count, trap_appearing_chance // diff,
+                             traps_max_count, watches_appearing_chance, watches_max_count, boosters_appearing_chance,
+                             boosters_max_count)
     if first_phase.loop(screen):
         running = True
         x_pos = 0
