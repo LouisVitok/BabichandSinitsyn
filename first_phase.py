@@ -83,13 +83,14 @@ class Watches(Object):
 
 
 class Player(pygame.sprite.Sprite):
-    def __init__(self, image, x, y, speed, jump_speed, rebound_speed):
+    def __init__(self, image, x, y, max_speed, jump_speed, rebound_speed):
         if not hasattr(Player, "group"):
             Player.group = pygame.sprite.Group()
         super().__init__(Player.group)
         self.x = x
         self.y = y
         self.current_speed = 0
+        self.max_speed = max_speed
         self.start_jump_speed = jump_speed
         self.current_jump_speed = jump_speed
         self.jumping = False
@@ -100,7 +101,8 @@ class Player(pygame.sprite.Sprite):
         self.rebound_direction = 0
 
     def force(self, x):
-        self.current_speed += x
+        if -self.max_speed - x <= self.current_speed <= self.max_speed - x:
+            self.current_speed += x
 
     def move(self, x, y):
         if 0 < self.rect.x + x < pygame.display.get_surface().get_width() - self.rect.w:
@@ -180,6 +182,7 @@ class FirstPhase:
         score_gaining_multiply = 1
         touched = False
         touched_time = 0
+        moving = False
         while first_phase_running:
             if not start_onesec:
                 start_onesec = time.perf_counter()
@@ -190,19 +193,26 @@ class FirstPhase:
                 if pygame.KEYDOWN:
                     if pygame.key.get_pressed()[pygame.K_a] and not player.rebound:
                         player.force(-0.25)
+                        print(player.current_speed)
+                        moving = True
                     elif pygame.key.get_pressed()[pygame.K_d] and not player.rebound:
                         player.force(0.25)
+                        print(player.current_speed)
+                        moving = True
                     else:
-                        if player.current_speed > 0.25:
-                            player.current_speed -= 0.25
-                        elif player.current_speed < -0.25:
-                            player.current_speed += 0.25
-                        else:
-                            player.current_speed = 0
+                        moving = False
                 if pygame.key.get_pressed():
                     if (pygame.key.get_pressed()[pygame.K_w] or pygame.key.get_pressed()[pygame.K_SPACE]) \
                             and not player.rebound:
                         player.jumping = True
+            player.move(player.current_speed, 0)
+            if not moving:
+                if player.current_speed > 0.05:
+                    player.current_speed -= 0.05
+                elif player.current_speed < -0.05:
+                    player.current_speed += 0.05
+                else:
+                    player.current_speed = 0
             if player.jumping:
                 player.rect.top -= player.current_jump_speed * game_speed
                 player.current_jump_speed -= self.Fg
@@ -219,7 +229,6 @@ class FirstPhase:
                     player.rebound = False
                     player.current_jump_speed = player.start_jump_speed
                     player.rebound_direction = 0
-            player.move(player.current_speed, 0)
             screen.blit(background, (0, 0))
             screen.blit(health_text, (self.health_text_x, self.health_text_y))
             screen.blit(player_health_text, (self.player_health_x, self.player_health_y))

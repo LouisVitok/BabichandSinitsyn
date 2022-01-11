@@ -12,13 +12,13 @@ g = 4  # ускорение свободного падения
 health_appearing_chance = 1.5  # шанс появления здоровья
 trap_appearing_chance = 0.08  # шанс появления ловушек
 watches_appearing_chance = 0.6  # шанс появления часов
-boosters_appearing_chance = 0.2  # шанс появления бустеров
+boosters_appearing_chance = 0.00002  # шанс появления бустеров
 objects_existing_time = 5  # время жизни объектов на змеле (в секундах)
 health_max_count = 4  # максимальное кол-во здоровья
 traps_max_count = 2  # максимальное кол-во ловушек
 watches_max_count = 1  # максимальное кол-во часов
 boosters_max_count = 1  # максимальное кол-во бустеров
-PLAYER_SPEED = 8  # скорость игрока
+PLAYER_MAX_SPEED = 4.0  # скорость игрока
 PLAYER_JUMP_SPEED = 9  # скорость/ускорения прыжка игрока
 PLAYER_REBOUND_SPEED = 3  # скорость/ускорения отскока игрока по координате x
 PLAYER_HEALTH = 10  # здоровье игрока
@@ -97,7 +97,7 @@ if __name__ == '__main__':
     diff = start_screen(width, height)
 
     first_phase = FirstPhase(width, height, int(TIME // diff), int(PLAYER_HEALTH // diff), health_appearing_chance // diff,
-                             PLAYER_SPEED, PLAYER_JUMP_SPEED, PLAYER_REBOUND_SPEED, Fg, HEALTH_TEXT_X, HEALTH_TEXT_Y,
+                             PLAYER_MAX_SPEED, PLAYER_JUMP_SPEED, PLAYER_REBOUND_SPEED, Fg, HEALTH_TEXT_X, HEALTH_TEXT_Y,
                              PLAYER_HEALTH_X, PLAYER_HEALTH_Y, TIMER_Y, health_max_count, trap_appearing_chance * diff,
                              traps_max_count, watches_appearing_chance // diff, watches_max_count, boosters_appearing_chance,
                              boosters_max_count)
