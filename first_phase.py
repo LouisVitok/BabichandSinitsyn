@@ -193,11 +193,9 @@ class FirstPhase:
                 if pygame.KEYDOWN:
                     if pygame.key.get_pressed()[pygame.K_a] and not player.rebound:
                         player.force(-0.25)
-                        print(player.current_speed)
                         moving = True
                     elif pygame.key.get_pressed()[pygame.K_d] and not player.rebound:
                         player.force(0.25)
-                        print(player.current_speed)
                         moving = True
                     else:
                         moving = False
