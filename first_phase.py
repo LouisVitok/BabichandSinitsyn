@@ -168,7 +168,6 @@ class FirstPhase:
         player = Player("player.png", 400, 417, self.player_speed, self.player_jump_speed, self.player_rebound_speed)
         first_phase_running = True
         quiting_from_game = False
-        speed_booster_new = False
         speed_booster_continue = False
         background = pygame.transform.scale(load_image('zastavka.jpg'), (self.width, self.height))
         health_text = pygame.font.Font(None, 30).render('Здоровье:', True, (255, 0, 0))
