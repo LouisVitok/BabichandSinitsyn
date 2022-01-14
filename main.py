@@ -89,7 +89,7 @@ def start_screen(width, height):
 if __name__ == '__main__':
     pygame.init()
     pygame.display.set_caption('Игра')
-    size = width, height = 800, 600
+    size = width, height = 1000, 750
     screen = pygame.display.set_mode(size)
     # pygame.mixer.music.load("sound2.mp3")
     # pygame.mixer.music.play(-1)
