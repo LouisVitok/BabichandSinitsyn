@@ -43,6 +43,7 @@ class Object(pygame.sprite.Sprite):
         elif not self.on_ground:
             self.on_ground = True
             self.start_time = time.perf_counter()
+            self.rect = self.rect.move(0, 544 - self.rect.top)
 
 
 
