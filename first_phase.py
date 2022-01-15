@@ -36,13 +36,14 @@ class Object(pygame.sprite.Sprite):
             self.current_time = time.perf_counter()
             if self.current_time - self.start_time >= float(objects_existing_time // game_speed):
                 self.erase = True
-        if self.rect.top <= 415:
+        if self.rect.top < 541:
             self.rect = self.rect.move(0, self.current_speed * game_speed / FPS + g)
             self.y += self.current_speed * game_speed / FPS + g
             self.current_speed += g
         elif not self.on_ground:
             self.on_ground = True
             self.start_time = time.perf_counter()
+
 
 
 class Health(Object):
@@ -53,25 +54,25 @@ class Health(Object):
 class Trap(Object):
     def __init__(self, x, y, speed):
         super().__init__("trap.png", x, y, speed)
-        self.image = pygame.transform.scale(self.image, (50, 50))
-        self.rect.w = 50
-        self.rect.h = 50
+        self.image = pygame.transform.scale(self.image, (40, 40))
+        self.rect.w = 40
+        self.rect.h = 40
 
 
 class SpeedBooster(Object):
     def __init__(self, x, y, speed):
         super().__init__("booster_speed.png", x, y, speed)
-        self.image = pygame.transform.scale(self.image, (50, 50))
-        self.rect.w = 50
-        self.rect.h = 50
+        self.image = pygame.transform.scale(self.image, (40, 40))
+        self.rect.w = 40
+        self.rect.h = 40
 
 
 class Watches(Object):
     def __init__(self, x, y, speed_x, speed_y):
         super().__init__("time.png", x, y, speed_x)
-        self.image = pygame.transform.scale(self.image, (50, 50))
-        self.rect.w = 50
-        self.rect.h = 50
+        self.image = pygame.transform.scale(self.image, (40, 40))
+        self.rect.w = 40
+        self.rect.h = 40
         self.speed_x = speed_x
         self.speed_y = speed_y
         self.erase = False
@@ -110,7 +111,6 @@ class Player(pygame.sprite.Sprite):
             self.x += x
         else:
             self.current_speed = 0
-        print(self.current_speed)
         self.rect.y += y
         self.y += y
 
@@ -166,7 +166,7 @@ class FirstPhase:
         game_speed = 1
         objects = [Health(random.randint(5, self.width - 55), -50, 5)]
         regular_sprites = []
-        player = Player("player2.png", 400, self.height * 0.75 + 40, self.player_speed, self.player_jump_speed, self.player_rebound_speed)
+        player = Player("player2.png", 400, 545, self.player_speed, self.player_jump_speed, self.player_rebound_speed)
         first_phase_running = True
         quiting_from_game = False
         speed_booster_continue = False
@@ -204,7 +204,7 @@ class FirstPhase:
                             and not player.rebound:
                         player.jumping = True
             player.move(player.current_speed, 0)
-            if not moving:
+            if not moving and not player.jumping and not player.rebound:
                 if player.current_speed > 0.05:
                     player.current_speed -= 0.05
                 elif player.current_speed < -0.05:
@@ -214,7 +214,7 @@ class FirstPhase:
             if player.jumping:
                 player.rect.top -= player.current_jump_speed * game_speed
                 player.current_jump_speed -= self.Fg
-                if player.rect.top >= self.height * 0.75 + 40:
+                if player.rect.top >= 545:
                     player.jumping = False
                     player.current_jump_speed = player.start_jump_speed
             if player.rebound:
@@ -223,7 +223,7 @@ class FirstPhase:
                         pygame.display.get_surface().get_width() - player.rect.w:
                     player.rect.left += player.rebound_speed * game_speed * player.rebound_direction
                 player.current_jump_speed -= self.Fg
-                if player.rect.top >= self.height * 0.75 + 40:
+                if player.rect.top >= 545:
                     player.rebound = False
                     player.current_jump_speed = player.start_jump_speed
                     player.rebound_direction = 0
