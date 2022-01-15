@@ -115,6 +115,13 @@ class Player(pygame.sprite.Sprite):
         self.rect.y += y
         self.y += y
 
+    def setImage(self, image, w, h):
+        self.image = load_image(image)
+        self.rect = self.image.get_rect().move(self.x, self.y)
+        self.rect.w = w
+        self.rect.h = h
+
+
 
 class RegularSprite(pygame.sprite.Sprite):
     def __init__(self, image, width, height, x, y):
