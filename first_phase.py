@@ -115,12 +115,8 @@ class Player(pygame.sprite.Sprite):
         self.rect.y += y
         self.y += y
 
-    def setImage(self, image, w, h):
+    def setImage(self, image):
         self.image = load_image(image)
-        self.rect = self.image.get_rect().move(self.x, self.y)
-        self.rect.w = w
-        self.rect.h = h
-
 
 
 class RegularSprite(pygame.sprite.Sprite):
@@ -289,6 +285,7 @@ class FirstPhase:
                     if type(objects[obj_i]) == Trap:
                         touched_time = time.perf_counter()
                         touched = True
+                        player.setImage("player3.png")
                         player.rebound = True
                         if abs(player.current_speed) >= 1:
                             player.rebound_speed = abs(player.current_speed)
@@ -340,6 +337,7 @@ class FirstPhase:
                 start_onesec = 0
             if touched and time.perf_counter() - touched_time >= 3.00:
                 touched = False
+                player.setImage("player2.png")
             if speed_booster_continue:
                 if time.perf_counter() - start_speed_booster >= 5.00:
                     speed_booster_continue = False
