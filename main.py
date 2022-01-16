@@ -6,14 +6,14 @@ from first_phase import FirstPhase
 FPS = 60
 
 # константы первой фазы:
-TIME = 120  # # таймер на первую фазу (в секундах)
+TIME = 45  # # таймер на первую фазу (в секундах)
 Fg = 0.4  # сила притяжения
 g = 4  # ускорение свободного падения
-health_appearing_chance = 1.5  # шанс появления здоровья
-trap_appearing_chance = 0.0008  # шанс появления ловушек
-watches_appearing_chance = 0.6  # шанс появления часов
-boosters_appearing_chance = 0.5  # шанс появления бустеров
-objects_existing_time = 5  # время жизни объектов на змеле (в секундах)
+health_appearing_chance = 3.5  # шанс появления здоровья
+trap_appearing_chance = 0.8  # шанс появления ловушек
+watches_appearing_chance = 1.6  # шанс появления часов
+boosters_appearing_chance = 0.45  # шанс появления бустеров
+objects_existing_time = 5  # время жизни объектов на езмеле (в секундах)
 health_max_count = 4  # максимальное кол-во здоровья
 traps_max_count = 2  # максимальное кол-во ловушек
 watches_max_count = 1  # максимальное кол-во часов
