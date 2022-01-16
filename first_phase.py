@@ -3,8 +3,7 @@ import os
 import random
 import time
 
-all_objects = pygame.sprite.Group()
-player_group = pygame.sprite.Group()
+
 fp_clock = pygame.time.Clock()
 objects_existing_time = 5
 FPS = 60
@@ -36,13 +35,14 @@ class Object(pygame.sprite.Sprite):
             self.current_time = time.perf_counter()
             if self.current_time - self.start_time >= float(objects_existing_time // game_speed):
                 self.erase = True
-        if self.rect.top <= 415:
+        if self.rect.top < 541:
             self.rect = self.rect.move(0, self.current_speed * game_speed / FPS + g)
             self.y += self.current_speed * game_speed / FPS + g
             self.current_speed += g
         elif not self.on_ground:
             self.on_ground = True
             self.start_time = time.perf_counter()
+            self.rect = self.rect.move(0, 544 - self.rect.top)
 
 
 class Health(Object):
@@ -53,25 +53,25 @@ class Health(Object):
 class Trap(Object):
     def __init__(self, x, y, speed):
         super().__init__("trap.png", x, y, speed)
-        self.image = pygame.transform.scale(self.image, (50, 50))
-        self.rect.w = 50
-        self.rect.h = 50
+        self.image = pygame.transform.scale(self.image, (40, 40))
+        self.rect.w = 40
+        self.rect.h = 40
 
 
 class SpeedBooster(Object):
     def __init__(self, x, y, speed):
         super().__init__("booster_speed.png", x, y, speed)
-        self.image = pygame.transform.scale(self.image, (50, 50))
-        self.rect.w = 50
-        self.rect.h = 50
+        self.image = pygame.transform.scale(self.image, (40, 40))
+        self.rect.w = 40
+        self.rect.h = 40
 
 
 class Watches(Object):
     def __init__(self, x, y, speed_x, speed_y):
         super().__init__("time.png", x, y, speed_x)
-        self.image = pygame.transform.scale(self.image, (50, 50))
-        self.rect.w = 50
-        self.rect.h = 50
+        self.image = pygame.transform.scale(self.image, (40, 40))
+        self.rect.w = 40
+        self.rect.h = 40
         self.speed_x = speed_x
         self.speed_y = speed_y
         self.erase = False
@@ -83,13 +83,14 @@ class Watches(Object):
 
 
 class Player(pygame.sprite.Sprite):
-    def __init__(self, image, x, y, speed, jump_speed, rebound_speed):
+    def __init__(self, image, x, y, max_speed, jump_speed, rebound_speed):
         if not hasattr(Player, "group"):
             Player.group = pygame.sprite.Group()
         super().__init__(Player.group)
         self.x = x
         self.y = y
         self.current_speed = 0
+        self.max_speed = max_speed
         self.start_jump_speed = jump_speed
         self.current_jump_speed = jump_speed
         self.jumping = False
@@ -99,8 +100,9 @@ class Player(pygame.sprite.Sprite):
         self.rebound_speed = rebound_speed
         self.rebound_direction = 0
 
-    def force(self, x):
-        self.current_speed += x
+    def force(self, x, game_speed):
+        if -self.max_speed * game_speed - x <= self.current_speed <= self.max_speed * game_speed - x:
+            self.current_speed += x
 
     def move(self, x, y):
         if 0 < self.rect.x + x < pygame.display.get_surface().get_width() - self.rect.w:
@@ -111,11 +113,14 @@ class Player(pygame.sprite.Sprite):
         self.rect.y += y
         self.y += y
 
+    def setImage(self, image):
+        self.image = load_image(image)
+
 
 class RegularSprite(pygame.sprite.Sprite):
+    group = pygame.sprite.Group()
+
     def __init__(self, image, width, height, x, y):
-        if not hasattr(RegularSprite, "group"):
-            RegularSprite.group = pygame.sprite.Group()
         super().__init__(RegularSprite.group)
         self.image = pygame.transform.scale(load_image(image), (width, height))
         self.rect = self.image.get_rect().move(x, y)
@@ -163,11 +168,11 @@ class FirstPhase:
         game_speed = 1
         objects = [Health(random.randint(5, self.width - 55), -50, 5)]
         regular_sprites = []
-        player = Player("player.png", 400, 417, self.player_speed, self.player_jump_speed, self.player_rebound_speed)
+        player = Player("player.png", 400, 545, self.player_speed, self.player_jump_speed, self.player_rebound_speed)
         first_phase_running = True
         quiting_from_game = False
-        speed_booster_new = False
         speed_booster_continue = False
+        speed_booster_touched = False
         background = pygame.transform.scale(load_image('zastavka.jpg'), (self.width, self.height))
         health_text = pygame.font.Font(None, 30).render('Здоровье:', True, (255, 0, 0))
         player_health_text = pygame.font.Font(None, 30).render(str(self.fp_player_health), True, (255, 0, 0))
@@ -180,6 +185,7 @@ class FirstPhase:
         score_gaining_multiply = 1
         touched = False
         touched_time = 0
+        moving = False
         while first_phase_running:
             if not start_onesec:
                 start_onesec = time.perf_counter()
@@ -188,25 +194,31 @@ class FirstPhase:
                     first_phase_running = False
                     quiting_from_game = True
                 if pygame.KEYDOWN:
-                    if pygame.key.get_pressed()[pygame.K_a] and not player.rebound:
-                        player.force(-0.25)
-                    elif pygame.key.get_pressed()[pygame.K_d] and not player.rebound:
-                        player.force(0.25)
-                    else:
-                        if player.current_speed > 0.25:
-                            player.current_speed -= 0.25
-                        elif player.current_speed < -0.25:
-                            player.current_speed += 0.25
+                    if not player.rebound and not player.jumping:
+                        if pygame.key.get_pressed()[pygame.K_a]:
+                            player.force(-0.25 * game_speed, game_speed)
+                            moving = True
+                        elif pygame.key.get_pressed()[pygame.K_d] and not player.rebound:
+                            player.force(0.25 * game_speed, game_speed)
+                            moving = True
                         else:
-                            player.current_speed = 0
+                            moving = False
                 if pygame.key.get_pressed():
                     if (pygame.key.get_pressed()[pygame.K_w] or pygame.key.get_pressed()[pygame.K_SPACE]) \
                             and not player.rebound:
                         player.jumping = True
+            player.move(player.current_speed, 0)
+            if not moving and not player.jumping and not player.rebound:
+                if player.current_speed > 0.05 * game_speed:
+                    player.current_speed -= 0.05 * game_speed
+                elif player.current_speed < -0.05 * game_speed:
+                    player.current_speed += 0.05 * game_speed
+                else:
+                    player.current_speed = 0
             if player.jumping:
                 player.rect.top -= player.current_jump_speed * game_speed
-                player.current_jump_speed -= self.Fg
-                if player.rect.top >= 417:
+                player.current_jump_speed -= self.Fg * game_speed
+                if player.rect.top >= 545:
                     player.jumping = False
                     player.current_jump_speed = player.start_jump_speed
             if player.rebound:
@@ -215,11 +227,10 @@ class FirstPhase:
                         pygame.display.get_surface().get_width() - player.rect.w:
                     player.rect.left += player.rebound_speed * game_speed * player.rebound_direction
                 player.current_jump_speed -= self.Fg
-                if player.rect.top >= 417:
+                if player.rect.top >= 545:
                     player.rebound = False
                     player.current_jump_speed = player.start_jump_speed
                     player.rebound_direction = 0
-            player.move(player.current_speed, 0)
             screen.blit(background, (0, 0))
             screen.blit(health_text, (self.health_text_x, self.health_text_y))
             screen.blit(player_health_text, (self.player_health_x, self.player_health_y))
@@ -229,6 +240,7 @@ class FirstPhase:
             Object.group.draw(screen)
             Object.group.update(game_speed)
             Player.group.draw(screen)
+            RegularSprite.group.draw(screen)
             pygame.display.flip()
             fp_clock.tick(FPS)
             dice = random.uniform(1.0, 100.0)
@@ -274,6 +286,7 @@ class FirstPhase:
                     if type(objects[obj_i]) == Trap:
                         touched_time = time.perf_counter()
                         touched = True
+                        player.setImage("player_transparent.png")
                         player.rebound = True
                         if abs(player.current_speed) >= 1:
                             player.rebound_speed = abs(player.current_speed)
@@ -298,12 +311,15 @@ class FirstPhase:
                         seconds_timer_text = pygame.font.Font(None, 30).render(str(time_left), True, (130, 131, 133))
                         player_score += 2 * score_gaining_multiply
                         score_text = pygame.font.Font(None, 30).render(str(player_score), True, (255, 255, 0))
-                    if type(objects[obj_i]) == SpeedBooster:
+                    if type(objects[obj_i]) == SpeedBooster and not speed_booster_touched:
+                        objects[obj_i].erase = True
                         start_speed_booster = time.perf_counter()
                         speed_booster_continue = True
+                        speed_booster_touched = True
                         game_speed = 2
                         score_gaining_multiply = 3
-                        regular_sprites.append(RegularSprite("booster_speed.png", 50, 50, 5, 421))
+                        regular_sprites.append(RegularSprite("booster_speed.png", 100, 100, 45, 593))
+                        regular_sprites.append(RegularSprite("red_frame.png", 100, 100, 45, 593))
                 if type(objects[obj_i]) == Watches:
                     if objects[obj_i].x <= -150 or objects[obj_i].x >= self.width + 175:
                         objects[obj_i].erase = True
@@ -325,11 +341,16 @@ class FirstPhase:
                 start_onesec = 0
             if touched and time.perf_counter() - touched_time >= 3.00:
                 touched = False
+                player.setImage("player.png")
             if speed_booster_continue:
                 if time.perf_counter() - start_speed_booster >= 5.00:
                     speed_booster_continue = False
                     game_speed = 1
                     score_gaining_multiply = 1
+                    for sprite_i in range(len(regular_sprites) - 1):
+                        RegularSprite.group.remove(regular_sprites[sprite_i])
+                        regular_sprites.pop(sprite_i)
+                    speed_booster_touched = False
             if not time_left:
                 return 1
             if player_health <= 0:

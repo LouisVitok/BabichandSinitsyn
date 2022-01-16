@@ -7,21 +7,21 @@ FPS = 60
 
 # константы первой фазы:
 TIME = 120  # # таймер на первую фазу (в секундах)
-Fg = 0.2  # сила притяжения
+Fg = 0.4  # сила притяжения
 g = 4  # ускорение свободного падения
 health_appearing_chance = 1.5  # шанс появления здоровья
-trap_appearing_chance = 0.8  # шанс появления ловушек
-watches_appearing_chance = 0.0003  # шанс появления часов
-boosters_appearing_chance = 0.2  # шанс появления бустеров
+trap_appearing_chance = 0.0008  # шанс появления ловушек
+watches_appearing_chance = 0.6  # шанс появления часов
+boosters_appearing_chance = 0.5  # шанс появления бустеров
 objects_existing_time = 5  # время жизни объектов на змеле (в секундах)
 health_max_count = 4  # максимальное кол-во здоровья
 traps_max_count = 2  # максимальное кол-во ловушек
 watches_max_count = 1  # максимальное кол-во часов
 boosters_max_count = 1  # максимальное кол-во бустеров
-PLAYER_SPEED = 8  # скорость игрока
-PLAYER_JUMP_SPEED = 9  # скорость/ускорения прыжка игрока
+PLAYER_MAX_SPEED = 4.0  # максимальная скорость игрока
+PLAYER_JUMP_SPEED = 15  # скорость/ускорения прыжка игрока
 PLAYER_REBOUND_SPEED = 3  # скорость/ускорения отскока игрока по координате x
-PLAYER_HEALTH = 100000  # здоровье игрока
+PLAYER_HEALTH = 10  # здоровье игрока
 HEALTH_TEXT_X = 10
 HEALTH_TEXT_Y = 10
 PLAYER_HEALTH_X = 120
@@ -37,14 +37,18 @@ def load_image(name):
 
 
 def start_screen(width, height):
-    intro = ['Нажмите клавишу']
+    intro = ['Выберите сложность', 'Легко', 'Нормально', 'Сложно']
+    fonts = []
     background = pygame.transform.scale(load_image('zastavka.jpg'), (width, height))
     screen.blit(background, (0, 0))
+    y = 5
     for line in intro:
         s = pygame.font.Font(None, 70).render(line, True, (250, 250, 210))
         rect = s.get_rect()
-        rect.x = width // 2 - 220
-        rect.y = height // 2 - 30
+        rect.x = width // 2 - rect.w // 2
+        rect.y = y
+        y += height // 4
+        fonts.append(s)
         screen.blit(s, (rect.x, rect.y))
     running = True
     while running:
@@ -54,7 +58,30 @@ def start_screen(width, height):
                 sys.exit()
                 return
             if event.type == pygame.KEYDOWN or event.type == pygame.MOUSEBUTTONDOWN:
-                return
+                y = 5
+                for i in range(len(fonts)):
+                    rect = fonts[i].get_rect()
+                    rect.x = width // 2 - rect.w // 2
+                    rect.y = y
+                    if rect.collidepoint(pygame.mouse.get_pos()) and i != 0:
+                        if intro[i] == 'Легко':
+                            return 1
+                        if intro[i] == 'Нормально':
+                            return 1.5
+                        if intro[i] == 'Сложно':
+                            return 3
+                    y += height // 4
+        # screen.blit(background, (0, 0))
+        for i in range(len(intro)):
+            if fonts[i].get_rect().collidepoint(pygame.mouse.get_pos()):
+                color = (255, 10, 10)
+            else:
+                color = (250, 250, 210)
+            rect = fonts[i].get_rect()
+            x = width // 2 - rect.w // 2
+            screen.blit(fonts[i], (x, y))
+            pygame.display.flip()
+            y += height // 4
         pygame.display.flip()
         clock.tick(FPS)
 
@@ -62,17 +89,18 @@ def start_screen(width, height):
 if __name__ == '__main__':
     pygame.init()
     pygame.display.set_caption('Игра')
-    size = width, height = 800, 600
+    size = width, height = 1000, 750
     screen = pygame.display.set_mode(size)
     # pygame.mixer.music.load("sound2.mp3")
     # pygame.mixer.music.play(-1)
     clock = pygame.time.Clock()
-    start_screen(800, 600)
+    diff = start_screen(width, height)
 
-    first_phase = FirstPhase(width, height, TIME, PLAYER_HEALTH, health_appearing_chance, PLAYER_SPEED,
-                             PLAYER_JUMP_SPEED, PLAYER_REBOUND_SPEED, Fg, HEALTH_TEXT_X, HEALTH_TEXT_Y, PLAYER_HEALTH_X,
-                             PLAYER_HEALTH_Y, TIMER_Y, health_max_count, trap_appearing_chance, traps_max_count,
-                             watches_appearing_chance, watches_max_count, boosters_appearing_chance, boosters_max_count)
+    first_phase = FirstPhase(width, height, int(TIME // diff), int(PLAYER_HEALTH // diff), health_appearing_chance // diff,
+                             PLAYER_MAX_SPEED, PLAYER_JUMP_SPEED, PLAYER_REBOUND_SPEED, Fg, HEALTH_TEXT_X, HEALTH_TEXT_Y,
+                             PLAYER_HEALTH_X, PLAYER_HEALTH_Y, TIMER_Y, health_max_count, trap_appearing_chance * diff,
+                             traps_max_count, watches_appearing_chance // diff, watches_max_count, boosters_appearing_chance,
+                             boosters_max_count)
     if first_phase.loop(screen):
         running = True
         x_pos = 0
