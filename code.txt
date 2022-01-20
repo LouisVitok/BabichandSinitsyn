@@ -8,7 +8,7 @@ from first_phase import FirstPhase
 FPS = 60
 
 # константы первой фазы:
-TIME = 1  # # таймер на первую фазу (в секундах)
+TIME = 45  # # таймер на первую фазу (в секундах)
 Fg = 0.4  # сила притяжения
 g = 4  # ускорение свободного падения
 health_appearing_chance = 3.5  # шанс появления здоровья
@@ -69,6 +69,22 @@ def load_image(name):
     image = pygame.image.load(fullname)
     image = image.convert_alpha()
     return image
+
+
+def final_screen(score, width, height):
+    background = pygame.transform.scale(load_image('zastavka.jpg'), (width, height))
+    screen.blit(background, (0, 0))
+    score_text_ = pygame.font.Font(None, 120).render(str(score), True, (255, 255, 0))
+    your_score_text = pygame.font.Font(None, 120).render("Ваши очки:", True, (255, 255, 0))
+    running_screen = True
+    while running_screen:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+                return
+        screen.blit(your_score_text, (10, height // 2))
+        screen.blit(score_text, (10, height // 2))
 
 
 def start_screen(width, height):
@@ -153,6 +169,7 @@ if __name__ == '__main__':
     traps_count = 1
     touched = False
     start_time = 0
+    new_time_score = 0
 
     while running:
         for event in pygame.event.get():
@@ -193,7 +210,8 @@ if __name__ == '__main__':
             start_time = time.perf_counter()
         if time.perf_counter() - start_time >= 1:
             touched = False
+        if time.perf_counter() - new_time_score >= 5:
+            score += 1
         if player.health <= 0:
             pygame.quit()
-
-    pygame.quit()
+    final_screen(score, width, height)
