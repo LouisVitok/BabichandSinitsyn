@@ -29,6 +29,41 @@ PLAYER_HEALTH_Y = 10
 TIMER_Y = 10
 
 
+
+class Player(pygame.sprite.Sprite):
+    def __init__(self, image, x, y, jump_speed, health):
+        if not hasattr(Player, "group"):
+            Player.group = pygame.sprite.Group()
+        super().__init__(Player.group)
+        self.x = x
+        self.y = y
+        self.jumping = False
+        self.image = load_image(image)
+        self.rect = self.image.get_rect().move(x, y)
+        self.jump_speed = jump_speed
+        self.health = health
+
+        
+class Trap(pygame.sprite.Sprite):
+    def __init__(self, image, x, y, speed):
+        if not hasattr(Trap, "group"):
+            Trap.group = pygame.sprite.Group()
+        super().__init__(Trap.group)
+        self.x = x
+        self.y = y
+        self.jumping = False
+        self.image = load_image(image)
+        self.rect = self.image.get_rect().move(x, y)
+        self.speed = speed
+        self.image = pygame.transform.scale(self.image, (40, 40))
+        self.rect.w = 40
+        self.rect.h = 40
+
+    def update(self):
+        self.rect.left -= self.speed
+        
+        
+
 def load_image(name):
     fullname = os.path.join('images', name)
     image = pygame.image.load(fullname)
