@@ -120,6 +120,22 @@ def start_screen(width, height):
         pygame.display.flip()
         clock.tick(FPS)
 
+        
+def final_screen(score, width, height):
+    background = pygame.transform.scale(load_image('zastavka.jpg'), (width, height))
+    screen.blit(background, (0, 0))
+    score_text_ = pygame.font.Font(None, 120).render(str(score), True, (255, 255, 0))
+    your_score_text = pygame.font.Font(None, 120).render("Ваши очки:", True, (255, 255, 0))
+    running_screen = True
+    while running_screen:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+                return
+        screen.blit(your_score_text, (10, height // 2))
+        screen.blit(score_text, (10, height // 2))
+
 
 if __name__ == '__main__':
     pygame.init()
@@ -136,43 +152,66 @@ if __name__ == '__main__':
                              PLAYER_HEALTH_X, PLAYER_HEALTH_Y, TIMER_Y, health_max_count, trap_appearing_chance * diff,
                              traps_max_count, watches_appearing_chance // diff, watches_max_count, boosters_appearing_chance,
                              boosters_max_count)
-    if first_phase.loop(screen):
-        running = True
-        x_pos = 0
-        v = 30
-        fps = 60
-        a = -10
-        sc = 15
-        is_upper = False
-        pos = 447
-        k = 0
+    health, score = first_phase.loop(screen)
+    player = Player("player.png", width // 6, 545, PLAYER_JUMP_SPEED, health)
+    score_text = pygame.font.Font(None, 30).render(str(score), True, (255, 255, 0))
+    health_text = pygame.font.Font(None, 30).render(str(health), True, (255, 0, 0))
+    running = True
+    x_pos = 0
+    v = 30
+    fps = 60
+    a = -10
+    sc = 15
+    is_upper = False
+    pos = 545
+    k = 0
+    traps = [Trap("trap.png", width + 50, 545, 3)]
+    traps_count = 1
+    touched = False
+    start_time = 0
+    new_time_score = 0
 
-        while running:
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    running = False
-                if event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_SPACE:
-                        is_upper = True
+    while running:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
+            if pygame.key.get_pressed():
+                if pygame.key.get_pressed()[pygame.K_w] or pygame.key.get_pressed()[pygame.K_SPACE]:
+                    player.jumping = True
+        if player.jumping:
+            player.rect.top -= player.jump_speed
+            player.jump_speed -= Fg
+            if player.rect.top >= 545:
+                player.jumping = False
 
-            background = pygame.transform.scale(load_image('zastavka.jpg'), (width, height))
-            screen.blit(background, (0, 0))
-            if is_upper:
-                if k <= 3:
-                    pos = pos - sc + a / 2
-                else:
-                    pos = pos + sc - a / 2
-                pygame.draw.circle(screen, (255, 0, 0), (200, pos), 20)
-                k += 1
-                if k > 6:
-                    is_upper = False
-                    k = 0
-                    pos = 447
-            else:
-                pygame.draw.circle(screen, (255, 0, 0), (200, 447), 20)
-            pygame.draw.rect(screen, (0, 250, 154), (800 - int(x_pos), 447, 20, 20), 0)
+        background = pygame.transform.scale(load_image('zastavka.jpg'), (width, height))
+        screen.blit(background, (0, 0))
+        Player.group.draw(screen)
+        Trap.group.draw(screen)
+        Trap.group.update()
+        screen.blit(score_text, (0, 0))
+        screen.blit(health_text, (width // 2, 0))
+        clock.tick(fps)
+        pygame.display.flip()
 
-            x_pos += v / fps
-            clock.tick(fps)
-            pygame.display.flip()
-        pygame.quit()
+        dice = random.uniform(0.0, 100.0)
+        if dice <= 0.08 and traps_count <= 3:
+            traps.append(Trap("trap.png", width + 50, 545, 3))
+        for trap_i in range(len(traps)):
+            if traps[trap_i].x <= -50:
+                traps_count -= 1
+                Trap.group.remove(traps[trap_i])
+                traps.pop(trap_i)
+            if traps[trap_i].rect.colliderect(player.rect) and not touched:
+                player.health -= 1
+                health_text = pygame.font.Font(None, 30).render(str(player.health), True, (255, 0, 0))
+                touched = True
+        if touched:
+            start_time = time.perf_counter()
+        if time.perf_counter() - start_time >= 1:
+            touched = False
+        if time.perf_counter() - new_time_score >= 5:
+            score += 1
+        if player.health <= 0:
+            pygame.quit()
+    final_screen(score, width, height)
