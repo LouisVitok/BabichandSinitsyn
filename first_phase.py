@@ -226,11 +226,14 @@ class FirstPhase:
                 if 0 < player.rect.x + player.rebound_speed * game_speed * player.rebound_direction < \
                         pygame.display.get_surface().get_width() - player.rect.w:
                     player.rect.left += player.rebound_speed * game_speed * player.rebound_direction
-                player.current_jump_speed -= self.Fg
+                player.current_jump_speed -= self.Fg * game_speed
                 if player.rect.top >= 545:
                     player.rebound = False
                     player.current_jump_speed = player.start_jump_speed
                     player.rebound_direction = 0
+            if player.rect.top > 545:
+                player.rect.top = 545
+                player.y = 545
             screen.blit(background, (0, 0))
             screen.blit(health_text, (self.health_text_x, self.health_text_y))
             screen.blit(player_health_text, (self.player_health_x, self.player_health_y))
@@ -263,13 +266,13 @@ class FirstPhase:
                 else:
                     watches_y = random.randint(-155, -105)
                 if watches_x < 0:
-                    speed_x = random.randint(2, 5)
+                    speed_x = random.randint(1, 3)
                 else:
-                    speed_x = random.randint(-5, -2)
+                    speed_x = random.randint(-3, -1)
                 if watches_y < 0:
-                    speed_y = random.randint(2, 5)
+                    speed_y = random.randint(1, 3)
                 else:
-                    speed_y = random.randint(-5, -2)
+                    speed_y = random.randint(-3, -1)
                 objects.append(Watches(watches_x, watches_y, speed_x, speed_y))
                 watches_count += 1
             dice = random.uniform(0.1, 100.0)
@@ -307,7 +310,7 @@ class FirstPhase:
                             score_text = pygame.font.Font(None, 30).render(str(player_score), True, (255, 255, 0))
                     if type(objects[obj_i]) == Watches:
                         objects[obj_i].erase = True
-                        time_left += 5
+                        time_left += 5 * game_speed
                         seconds_timer_text = pygame.font.Font(None, 30).render(str(time_left), True, (130, 131, 133))
                         player_score += 2 * score_gaining_multiply
                         score_text = pygame.font.Font(None, 30).render(str(player_score), True, (255, 255, 0))
@@ -339,11 +342,11 @@ class FirstPhase:
                 time_left -= 1
                 seconds_timer_text = pygame.font.Font(None, 30).render(str(time_left), True, (130, 131, 133))
                 start_onesec = 0
-            if touched and time.perf_counter() - touched_time >= 3.00:
+            if touched and time.perf_counter() - touched_time >= 3.00 / game_speed:
                 touched = False
                 player.setImage("player.png")
             if speed_booster_continue:
-                if time.perf_counter() - start_speed_booster >= 5.00:
+                if time.perf_counter() - start_speed_booster >= 5.00 / game_speed:
                     speed_booster_continue = False
                     game_speed = 1
                     score_gaining_multiply = 1
