@@ -1,6 +1,8 @@
 import os
 import pygame
 import sys
+import time
+import random
 from first_phase import FirstPhase
 
 FPS = 60
@@ -31,7 +33,7 @@ TIMER_Y = 10
 
 
 class Player(pygame.sprite.Sprite):
-    def __init__(self, image, x, y, jump_speed, health):
+    def __init__(self, image, x, y, start_jump_speed, health):
         if not hasattr(Player, "group"):
             Player.group = pygame.sprite.Group()
         super().__init__(Player.group)
@@ -40,7 +42,8 @@ class Player(pygame.sprite.Sprite):
         self.jumping = False
         self.image = load_image(image)
         self.rect = self.image.get_rect().move(x, y)
-        self.jump_speed = jump_speed
+        self.jump_speed = start_jump_speed
+        self.start_jump_speed = start_jump_speed
         self.health = health
 
         
@@ -58,9 +61,11 @@ class Trap(pygame.sprite.Sprite):
         self.image = pygame.transform.scale(self.image, (40, 40))
         self.rect.w = 40
         self.rect.h = 40
+        self.touched = False
 
     def update(self):
         self.rect.left -= self.speed
+        self.x -= self.speed
         
         
 
@@ -106,7 +111,6 @@ def start_screen(width, height):
                         if intro[i] == 'Сложно':
                             return 3
                     y += height // 4
-        # screen.blit(background, (0, 0))
         for i in range(len(intro)):
             if fonts[i].get_rect().collidepoint(pygame.mouse.get_pos()):
                 color = (255, 10, 10)
@@ -121,20 +125,20 @@ def start_screen(width, height):
         clock.tick(FPS)
 
         
-def final_screen(score, width, height):
-    background = pygame.transform.scale(load_image('zastavka.jpg'), (width, height))
-    screen.blit(background, (0, 0))
-    score_text_ = pygame.font.Font(None, 120).render(str(score), True, (255, 255, 0))
+def final_screen(score_num):
+    background_img = pygame.transform.scale(load_image('zastavka.jpg'), (width, height))
+    screen.blit(background_img, (0, 0))
+    score_text_ = pygame.font.Font(None, 120).render(str(score_num), True, (255, 255, 0))
     your_score_text = pygame.font.Font(None, 120).render("Ваши очки:", True, (255, 255, 0))
+    screen.blit(your_score_text, (10, height // 2))
+    screen.blit(score_text_, (your_score_text.get_width() + 5, height // 2))
+    pygame.display.flip()
     running_screen = True
     while running_screen:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
-                return
-        screen.blit(your_score_text, (10, height // 2))
-        screen.blit(score_text, (10, height // 2))
 
 
 if __name__ == '__main__':
@@ -142,8 +146,6 @@ if __name__ == '__main__':
     pygame.display.set_caption('Игра')
     size = width, height = 1000, 750
     screen = pygame.display.set_mode(size)
-    # pygame.mixer.music.load("sound2.mp3")
-    # pygame.mixer.music.play(-1)
     clock = pygame.time.Clock()
     diff = start_screen(width, height)
 
@@ -157,14 +159,6 @@ if __name__ == '__main__':
     score_text = pygame.font.Font(None, 30).render(str(score), True, (255, 255, 0))
     health_text = pygame.font.Font(None, 30).render(str(health), True, (255, 0, 0))
     running = True
-    x_pos = 0
-    v = 30
-    fps = 60
-    a = -10
-    sc = 15
-    is_upper = False
-    pos = 545
-    k = 0
     traps = [Trap("trap.png", width + 50, 545, 3)]
     traps_count = 1
     touched = False
@@ -180,9 +174,10 @@ if __name__ == '__main__':
                     player.jumping = True
         if player.jumping:
             player.rect.top -= player.jump_speed
-            player.jump_speed -= Fg
+            player.jump_speed -= Fg * 2
             if player.rect.top >= 545:
                 player.jumping = False
+                player.jump_speed = player.start_jump_speed
 
         background = pygame.transform.scale(load_image('zastavka.jpg'), (width, height))
         screen.blit(background, (0, 0))
@@ -191,27 +186,32 @@ if __name__ == '__main__':
         Trap.group.update()
         screen.blit(score_text, (0, 0))
         screen.blit(health_text, (width // 2, 0))
-        clock.tick(fps)
         pygame.display.flip()
+        clock.tick(FPS)
 
         dice = random.uniform(0.0, 100.0)
-        if dice <= 0.08 and traps_count <= 3:
+        if dice <= 2.0 and traps_count < 3:
             traps.append(Trap("trap.png", width + 50, 545, 3))
+            traps_count += 1
+        for trap_i in range(len(traps)):
+            if traps[trap_i].rect.colliderect(player.rect) and not touched:
+                player.health -= 1
+                health_text = pygame.font.Font(None, 30).render(str(player.health), True, (255, 0, 0))
+                touched = True
+                traps[trap_i].touched = True
+            if traps[trap_i].x <= player.x - 50 and not traps[trap_i].touched:
+                score += 1
+                score_text = pygame.font.Font(None, 30).render(str(score), True, (255, 255, 0))
         for trap_i in range(len(traps)):
             if traps[trap_i].x <= -50:
                 traps_count -= 1
                 Trap.group.remove(traps[trap_i])
                 traps.pop(trap_i)
-            if traps[trap_i].rect.colliderect(player.rect) and not touched:
-                player.health -= 1
-                health_text = pygame.font.Font(None, 30).render(str(player.health), True, (255, 0, 0))
-                touched = True
+                break
         if touched:
             start_time = time.perf_counter()
         if time.perf_counter() - start_time >= 1:
             touched = False
-        if time.perf_counter() - new_time_score >= 5:
-            score += 1
         if player.health <= 0:
-            pygame.quit()
-    final_screen(score, width, height)
+            running = False
+    final_screen(score)
