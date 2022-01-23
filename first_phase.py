@@ -352,10 +352,10 @@ class FirstPhase:
                         regular_sprites.pop(sprite_i)
                     speed_booster_touched = False
             if not time_left:
-                return 1
+                return player_health, player_score
             if player_health <= 0:
                 return 0
             if quiting_from_game:
                 pygame.quit()
                 return 0
-        return 1
+        return player_health, player_score
